@@ -15,6 +15,57 @@ const ROOT_VIDEO_UPLOAD_WEB = 'assets/uploads/videos/';
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 20 * 1024 * 1024;
 
+function getSubscriptionPlans(): array
+{
+    return [
+        'basic' => [
+            'name' => 'Basic',
+            'price' => 199,
+            'listing_limit' => 1,
+            'image_limit' => 5,
+            'video_allowed' => false,
+            'youtube_allowed' => false,
+            'duration_days' => 7,
+            'visibility' => 'Standard visibility in search',
+            'restrictions' => [
+                'Cannot upload video',
+                'Cannot exceed 5 images',
+                'Only 1 active listing allowed',
+            ],
+        ],
+        'premium' => [
+            'name' => 'Premium',
+            'price' => 499,
+            'listing_limit' => 3,
+            'image_limit' => 15,
+            'video_allowed' => true,
+            'youtube_allowed' => false,
+            'duration_days' => 30,
+            'visibility' => 'Priority placement above Basic listings',
+            'restrictions' => [
+                'Maximum 3 active listings',
+                'Maximum 15 images per listing',
+            ],
+            'popular' => true,
+        ],
+        'featured' => [
+            'name' => 'Featured',
+            'price' => 999,
+            'listing_limit' => null,
+            'image_limit' => null,
+            'video_allowed' => true,
+            'youtube_allowed' => true,
+            'duration_days' => 60,
+            'visibility' => 'Top position in search results',
+            'restrictions' => [
+                'Unlimited listings',
+                'Unlimited images',
+            ],
+            'recommended' => true,
+        ],
+    ];
+}
+
 function isUserLoggedIn(): bool
 {
     return !empty($_SESSION['user_id']);
@@ -33,6 +84,100 @@ function getCurrentUserName(): string
 function getCurrentUserEmail(): string
 {
     return $_SESSION['user_email'] ?? '';
+}
+
+function normalizePlanType(string $planType): string
+{
+    return strtolower(normalizeText($planType));
+}
+
+function getPlanConfig(string $planType): ?array
+{
+    $planType = normalizePlanType($planType);
+    $plans = getSubscriptionPlans();
+
+    return $plans[$planType] ?? null;
+}
+
+function formatPlanName(string $planType): string
+{
+    $plan = getPlanConfig($planType);
+
+    return $plan['name'] ?? ucfirst(normalizePlanType($planType));
+}
+
+function getPlanBadgeLabel(string $planType): string
+{
+    $planType = normalizePlanType($planType);
+
+    if ($planType === 'featured') {
+        return 'STAR Featured';
+    }
+
+    if ($planType === 'premium') {
+        return 'Premium';
+    }
+
+    return 'Basic';
+}
+
+function getPlanCardClass(string $planType): string
+{
+    return 'plan-' . normalizePlanType($planType);
+}
+
+function getListingPlanCaseSql(string $columnName): string
+{
+    return "CASE
+        WHEN LOWER({$columnName}) = 'featured' THEN 60
+        WHEN LOWER({$columnName}) = 'premium' THEN 30
+        ELSE 7
+    END";
+}
+
+function getListingActiveSql(string $createdAtColumn = 'created_at', string $planTypeColumn = 'subscription_type'): string
+{
+    $durationSql = getListingPlanCaseSql($planTypeColumn);
+
+    return "DATE_ADD({$createdAtColumn}, INTERVAL {$durationSql} DAY) >= NOW()";
+}
+
+function getListingExpiryDate(string $createdAt, string $planType): string
+{
+    $plan = getPlanConfig($planType);
+    $durationDays = $plan['duration_days'] ?? 7;
+
+    return date('Y-m-d H:i:s', strtotime($createdAt . ' +' . $durationDays . ' days'));
+}
+
+function formatDisplayDate(string $value, string $format = 'd M Y'): string
+{
+    $timestamp = strtotime($value);
+    if (!$timestamp) {
+        return '';
+    }
+
+    return date($format, $timestamp);
+}
+
+function countActiveListingsForUser(int $userId): int
+{
+    $conn = getDBConnection();
+    $activeListingSql = getListingActiveSql('created_at', 'subscription_type');
+    $stmt = $conn->prepare(
+        "SELECT COUNT(*) AS total
+         FROM listings
+         WHERE user_id = ?
+           AND {$activeListingSql}"
+    );
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $total = (int) (($result->fetch_assoc()['total'] ?? 0));
+    $stmt->close();
+    closeDBConnection($conn);
+
+    return $total;
 }
 
 function redirectTo(string $path): void
@@ -83,9 +228,10 @@ function getActiveSubscription(?int $userId = null): ?array
 
     $conn = getDBConnection();
     $stmt = $conn->prepare(
-        'SELECT id, user_id, plan_type, created_at
+        'SELECT id, user_id, plan_type, listing_limit, image_limit, video_allowed, expiry_date, created_at
          FROM subscriptions
          WHERE user_id = ?
+           AND expiry_date >= CURDATE()
          ORDER BY created_at DESC, id DESC
          LIMIT 1'
     );
@@ -95,6 +241,16 @@ function getActiveSubscription(?int $userId = null): ?array
     $subscription = $result->fetch_assoc() ?: null;
     $stmt->close();
     closeDBConnection($conn);
+
+    if ($subscription) {
+        $subscription['plan_type'] = normalizePlanType($subscription['plan_type']);
+        $subscription['plan_name'] = formatPlanName($subscription['plan_type']);
+        $subscription['badge_label'] = getPlanBadgeLabel($subscription['plan_type']);
+        $subscription['listing_limit'] = $subscription['listing_limit'] !== null ? (int) $subscription['listing_limit'] : null;
+        $subscription['image_limit'] = $subscription['image_limit'] !== null ? (int) $subscription['image_limit'] : null;
+        $subscription['video_allowed'] = (bool) $subscription['video_allowed'];
+        $subscription['youtube_allowed'] = (bool) (getPlanConfig($subscription['plan_type'])['youtube_allowed'] ?? false);
+    }
 
     return $subscription;
 }
@@ -192,11 +348,13 @@ function storeUploadedFile(array $file, string $targetDir, array $allowedExtensi
 function getListingById(int $listingId): ?array
 {
     $conn = getDBConnection();
+    $activeListingSql = getListingActiveSql('l.created_at', 'l.subscription_type');
     $stmt = $conn->prepare(
         'SELECT l.*, u.name AS seller_name, u.email AS seller_email
          FROM listings l
          INNER JOIN users u ON u.id = l.user_id
-         WHERE l.id = ?
+         WHERE ' . $activeListingSql . '
+           AND l.id = ?
          LIMIT 1'
     );
     $stmt->bind_param('i', $listingId);
@@ -207,6 +365,10 @@ function getListingById(int $listingId): ?array
     closeDBConnection($conn);
 
     if ($listing) {
+        $listing['subscription_type'] = normalizePlanType($listing['subscription_type'] ?? 'basic');
+        $listing['subscription_name'] = formatPlanName($listing['subscription_type']);
+        $listing['badge_label'] = getPlanBadgeLabel($listing['subscription_type']);
+        $listing['listing_expiry_date'] = getListingExpiryDate($listing['created_at'], $listing['subscription_type']);
         $listing['image_list'] = json_decode($listing['images'] ?? '[]', true) ?: [];
     }
 
