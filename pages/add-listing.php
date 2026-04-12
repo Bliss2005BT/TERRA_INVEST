@@ -5,6 +5,7 @@ require_once __DIR__ . '/../includes/bootstrap.php';
 requireLogin();
 $subscription = requireSubscription();
 $pageTitle = 'Add Listing';
+$activeListingCount = countActiveListingsForUser((int) getCurrentUserId());
 
 $formData = [
     'title' => '',
@@ -53,14 +54,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Enter a valid YouTube link.';
     }
 
+    $selectedImageCount = 0;
     if (empty($_FILES['images']['name'][0])) {
         $errors[] = 'At least one image is required.';
+    } else {
+        $selectedImageCount = count(array_filter($_FILES['images']['name'], static fn ($name): bool => trim((string) $name) !== ''));
+    }
+
+    if (($subscription['listing_limit'] ?? 0) > 0 && $activeListingCount >= (int) $subscription['listing_limit']) {
+        $errors[] = 'Your current plan allows only ' . $subscription['listing_limit'] . ' active listing(s). Please upgrade or wait for an active listing to expire.';
+    }
+
+    if (($subscription['image_limit'] ?? 0) > 0 && $selectedImageCount > (int) $subscription['image_limit']) {
+        $errors[] = 'Your ' . $subscription['plan_name'] . ' plan allows a maximum of ' . $subscription['image_limit'] . ' images per listing.';
+    }
+
+    $hasUploadedVideo = !empty($_FILES['video']['name']);
+    $hasYouTubeLink = $formData['youtube_link'] !== '';
+
+    if ($hasUploadedVideo && !$subscription['video_allowed']) {
+        $errors[] = 'Video upload is not available on the ' . $subscription['plan_name'] . ' plan.';
+    }
+
+    if ($hasYouTubeLink && empty($subscription['youtube_allowed'])) {
+        $errors[] = 'YouTube links are available only on the Featured plan.';
     }
 
     $imagePaths = [];
     if (!$errors) {
         $imageCount = count($_FILES['images']['name']);
         for ($index = 0; $index < $imageCount; $index++) {
+            if (trim((string) $_FILES['images']['name'][$index]) === '') {
+                continue;
+            }
+
             $file = [
                 'name' => $_FILES['images']['name'][$index],
                 'type' => $_FILES['images']['type'][$index],
@@ -87,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $videoPath = '';
-    if (!$errors && !empty($_FILES['video']['name'])) {
+    if (!$errors && $hasUploadedVideo) {
         $videoUpload = storeUploadedFile(
             $_FILES['video'],
             VIDEO_UPLOAD_DIR,
@@ -103,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    if (!$errors && $videoPath !== '' && $formData['youtube_link'] !== '') {
+    if (!$errors && $videoPath !== '' && $hasYouTubeLink) {
         $errors[] = 'Please upload a video or provide a YouTube link, not both.';
     }
 
@@ -156,9 +183,23 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="page-heading">
             <div>
                 <h1>Add a Land Listing</h1>
-                <p>Plan selected: <strong><?php echo esc($subscription['plan_type']); ?></strong>. Seller details will be attached automatically from your logged-in account.</p>
+                <p>Plan selected: <strong><?php echo esc($subscription['plan_name']); ?></strong>. Seller details will be attached automatically from your logged-in account.</p>
             </div>
-            <span class="badge"><?php echo esc($subscription['plan_type']); ?></span>
+            <span class="badge badge-<?php echo esc($subscription['plan_type']); ?>"><?php echo esc($subscription['plan_name']); ?></span>
+        </div>
+
+        <div class="subscription-info-grid">
+            <article class="info-card">
+                <h3>Current Subscription</h3>
+                <p>Expiry: <strong><?php echo esc(formatDisplayDate($subscription['expiry_date'])); ?></strong></p>
+                <p>Active listings used: <strong><?php echo esc((string) $activeListingCount); ?></strong><?php echo ($subscription['listing_limit'] ?? 0) > 0 ? ' / <strong>' . esc((string) $subscription['listing_limit']) . '</strong>' : ' / <strong>Unlimited</strong>'; ?></p>
+            </article>
+            <article class="info-card">
+                <h3>Publishing Limits</h3>
+                <p>Images allowed: <strong><?php echo ($subscription['image_limit'] ?? 0) > 0 ? esc((string) $subscription['image_limit']) : 'Unlimited'; ?></strong></p>
+                <p>Video upload: <strong><?php echo $subscription['video_allowed'] ? 'Yes' : 'No'; ?></strong></p>
+                <p>YouTube link: <strong><?php echo !empty($subscription['youtube_allowed']) ? 'Yes' : 'No'; ?></strong></p>
+            </article>
         </div>
 
         <?php if ($errors): ?>
@@ -209,19 +250,19 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="field-group full-width">
                     <label for="images">Property Images</label>
                     <input type="file" id="images" name="images[]" accept=".jpg,.jpeg,.png" multiple required>
-                    <span class="helper-text">Upload JPG or PNG images only. Maximum 5 MB per image.</span>
+                    <span class="helper-text">Upload JPG or PNG images only. Maximum 5 MB per image. Plan limit: <?php echo ($subscription['image_limit'] ?? 0) > 0 ? esc((string) $subscription['image_limit']) : 'Unlimited'; ?> image(s).</span>
                     <div class="preview-grid" id="image-preview-grid">
                         <div class="preview-item">Image preview appears here</div>
                     </div>
                 </div>
                 <div class="field-group">
                     <label for="video">Video Upload (MP4 only)</label>
-                    <input type="file" id="video" name="video" accept=".mp4">
-                    <span class="helper-text">Optional. Maximum 20 MB.</span>
+                    <input type="file" id="video" name="video" accept=".mp4" <?php echo $subscription['video_allowed'] ? '' : 'disabled'; ?>>
+                    <span class="helper-text"><?php echo $subscription['video_allowed'] ? 'Optional. Maximum 20 MB.' : 'Not available on your current plan.'; ?></span>
                 </div>
                 <div class="field-group">
                     <label for="youtube_link">Or YouTube Link</label>
-                    <input type="url" id="youtube_link" name="youtube_link" value="<?php echo esc($formData['youtube_link']); ?>" placeholder="https://www.youtube.com/watch?v=...">
+                    <input type="url" id="youtube_link" name="youtube_link" value="<?php echo esc($formData['youtube_link']); ?>" placeholder="https://www.youtube.com/watch?v=..." <?php echo !empty($subscription['youtube_allowed']) ? '' : 'disabled'; ?>>
                 </div>
             </div>
 

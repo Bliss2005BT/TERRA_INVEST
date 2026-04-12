@@ -12,5 +12,7 @@ echo json_encode([
     'userName' => isUserLoggedIn() ? getCurrentUserName() : null,
     'userEmail' => isUserLoggedIn() ? getCurrentUserEmail() : null,
     'subscription' => $subscription ? $subscription['plan_type'] : null,
+    'subscriptionName' => $subscription ? $subscription['plan_name'] : null,
+    'subscriptionExpiry' => $subscription ? $subscription['expiry_date'] : null,
 ]);
 ?>

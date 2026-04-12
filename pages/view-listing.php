@@ -18,7 +18,9 @@ require_once __DIR__ . '/../includes/header.php';
         <section class="page-panel">
             <div class="page-heading">
                 <div>
-                    <span class="badge"><?php echo esc($listing['subscription_type']); ?></span>
+                    <span class="badge badge-<?php echo esc($listing['subscription_type']); ?>">
+                        <?php echo $listing['subscription_type'] === 'featured' ? '&#11088; ' : ''; ?><?php echo esc($listing['badge_label']); ?>
+                    </span>
                     <h1><?php echo esc($listing['title']); ?></h1>
                     <p class="page-subtext"><?php echo esc($listing['location']); ?> | <?php echo esc($listing['property_type']); ?></p>
                 </div>
@@ -68,6 +70,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <span><?php echo esc($listing['property_type']); ?></span>
                         <span><?php echo esc($listing['location']); ?></span>
                         <span>Listed on <?php echo esc(date('d M Y', strtotime($listing['created_at']))); ?></span>
+                        <span>Expires on <?php echo esc(formatDisplayDate($listing['listing_expiry_date'])); ?></span>
                     </div>
                     <p><?php echo nl2br(esc($listing['description'])); ?></p>
                 </article>
@@ -77,7 +80,8 @@ require_once __DIR__ . '/../includes/header.php';
                         <li><strong>Amenities:</strong> <?php echo esc($listing['amenities'] ?: 'Not specified'); ?></li>
                         <li><strong>Seller:</strong> <?php echo esc($listing['seller_name']); ?></li>
                         <li><strong>Email:</strong> <?php echo esc($listing['seller_email']); ?></li>
-                        <li><strong>Subscription:</strong> <?php echo esc($listing['subscription_type']); ?></li>
+                        <li><strong>Subscription:</strong> <?php echo esc($listing['subscription_name']); ?></li>
+                        <li><strong>Listing valid until:</strong> <?php echo esc(formatDisplayDate($listing['listing_expiry_date'])); ?></li>
                     </ul>
                     <a href="../search.php" class="btn-outline">Back to Search</a>
                 </article>

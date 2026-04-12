@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -111,7 +114,7 @@ function getPlanBadgeLabel(string $planType): string
     $planType = normalizePlanType($planType);
 
     if ($planType === 'featured') {
-        return 'STAR Featured';
+        return 'Featured';
     }
 
     if ($planType === 'premium') {
@@ -186,11 +189,11 @@ function redirectTo(string $path): void
     exit();
 }
 
-function requireLogin(): void
+function requireLogin(string $redirectPath = '../index.php'): void
 {
     if (!isUserLoggedIn()) {
         setFlash('error', 'Please log in to continue.');
-        redirectTo('../index.php?error=' . urlencode('Please log in to continue.'));
+        redirectTo($redirectPath . '?error=' . urlencode('Please log in to continue.'));
     }
 }
 
@@ -227,13 +230,14 @@ function getActiveSubscription(?int $userId = null): ?array
     }
 
     $conn = getDBConnection();
+    $subscriptionExpirySql = "DATE_ADD(created_at, INTERVAL " . getListingPlanCaseSql('plan_type') . " DAY)";
     $stmt = $conn->prepare(
-        'SELECT id, user_id, plan_type, listing_limit, image_limit, video_allowed, expiry_date, created_at
+        "SELECT id, user_id, plan_type, created_at, {$subscriptionExpirySql} AS expiry_date
          FROM subscriptions
          WHERE user_id = ?
-           AND expiry_date >= CURDATE()
+           AND {$subscriptionExpirySql} >= NOW()
          ORDER BY created_at DESC, id DESC
-         LIMIT 1'
+         LIMIT 1"
     );
     $stmt->bind_param('i', $userId);
     $stmt->execute();
@@ -246,10 +250,15 @@ function getActiveSubscription(?int $userId = null): ?array
         $subscription['plan_type'] = normalizePlanType($subscription['plan_type']);
         $subscription['plan_name'] = formatPlanName($subscription['plan_type']);
         $subscription['badge_label'] = getPlanBadgeLabel($subscription['plan_type']);
-        $subscription['listing_limit'] = $subscription['listing_limit'] !== null ? (int) $subscription['listing_limit'] : null;
-        $subscription['image_limit'] = $subscription['image_limit'] !== null ? (int) $subscription['image_limit'] : null;
-        $subscription['video_allowed'] = (bool) $subscription['video_allowed'];
-        $subscription['youtube_allowed'] = (bool) (getPlanConfig($subscription['plan_type'])['youtube_allowed'] ?? false);
+        $plan = getPlanConfig($subscription['plan_type']) ?? [];
+        $subscription['listing_limit'] = isset($plan['listing_limit']) && $plan['listing_limit'] !== null
+            ? (int) $plan['listing_limit']
+            : null;
+        $subscription['image_limit'] = isset($plan['image_limit']) && $plan['image_limit'] !== null
+            ? (int) $plan['image_limit']
+            : null;
+        $subscription['video_allowed'] = (bool) ($plan['video_allowed'] ?? false);
+        $subscription['youtube_allowed'] = (bool) ($plan['youtube_allowed'] ?? false);
     }
 
     return $subscription;

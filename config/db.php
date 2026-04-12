@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
 if (!defined('DB_HOST')) {
     define('DB_HOST', 'localhost');
 }
@@ -19,6 +22,7 @@ if (!defined('DB_NAME')) {
 
 function getDBConnection(): mysqli
 {
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
     if ($conn->connect_error) {
