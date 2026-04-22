@@ -117,9 +117,18 @@ closeDBConnection($conn);
 
     <div class="nav-actions">
       <a href="pages/subscription.php" class="listing-btn" id="listing-link">Add a Listing</a>
-      <div class="right">
-        <i class="fa-solid fa-user"></i>
-        <span id="search-username"><?php echo esc(getCurrentUserName()); ?></span>
+      <div class="user-menu" data-user-menu>
+        <button type="button" class="user-menu-toggle" data-user-menu-toggle aria-expanded="false">
+          <span class="right">
+            <i class="fa-solid fa-user"></i>
+            <span id="search-username"><?php echo esc(getCurrentUserName()); ?></span>
+          </span>
+          <i class="fa-solid fa-chevron-down user-menu-chevron" aria-hidden="true"></i>
+        </button>
+        <div class="user-dropdown" data-user-dropdown>
+          <a href="my-listings.php" class="user-dropdown-link">View My Listings</a>
+          <a href="php/logout.php" class="user-dropdown-link user-dropdown-link-danger">Logout</a>
+        </div>
       </div>
     </div>
   </header>
@@ -185,7 +194,13 @@ closeDBConnection($conn);
         <div class="empty-results">No listings found.</div>
       <?php else: ?>
         <?php foreach ($listings as $listing): ?>
-          <article class="listing-card plan-<?php echo esc($listing['subscription_type']); ?>">
+          <article
+            class="listing-card"
+            data-href="pages/view-listing.php?id=<?php echo (int) $listing['id']; ?>"
+            tabindex="0"
+            role="link"
+            aria-label="View listing in <?php echo esc(formatListingLocation($listing['location'])); ?>"
+          >
             <?php if ($listing['image'] !== ''): ?>
               <img src="<?php echo esc($listing['image']); ?>" alt="<?php echo esc($listing['title']); ?>">
             <?php else: ?>
@@ -193,24 +208,73 @@ closeDBConnection($conn);
             <?php endif; ?>
 
             <div class="listing-content">
-              <div class="listing-pill badge-<?php echo esc($listing['subscription_type']); ?>">
-                <?php echo $listing['subscription_type'] === 'featured' ? '&#11088; Featured' : esc($listing['badge_label']); ?>
-              </div>
-              <h3><?php echo esc($listing['title']); ?></h3>
-              <p class="listing-location"><?php echo esc($listing['location']); ?></p>
+              <p class="listing-price"><?php echo esc(formatListingPrice((float) $listing['price'])); ?></p>
+              <p class="listing-location"><?php echo esc(formatListingLocation($listing['location'])); ?></p>
               <div class="listing-meta">
-                <span><?php echo esc($listing['property_type']); ?></span>
-                <span>Rs. <?php echo esc(number_format((float) $listing['price'], 2)); ?></span>
-                <span><?php echo esc(number_format((float) $listing['area'], 2)); ?> sq ft</span>
+                <span class="listing-area"><?php echo esc(formatListingArea((float) $listing['area'])); ?></span>
+                <span class="listing-type"><?php echo esc($listing['property_type']); ?></span>
               </div>
-              <p class="listing-text"><?php echo esc(mb_strimwidth($listing['description'], 0, 130, '...')); ?></p>
-              <p class="listing-expiry">Valid until <?php echo esc(formatDisplayDate($listing['listing_expiry_date'])); ?></p>
-              <a class="listing-view-btn" href="pages/view-listing.php?id=<?php echo (int) $listing['id']; ?>">View Listing</a>
+              <?php if (trim((string) $listing['description']) !== ''): ?>
+                <p class="listing-text"><?php echo esc(mb_strimwidth(trim((string) $listing['description']), 0, 58, '...')); ?></p>
+              <?php endif; ?>
+              <a class="listing-view-btn" href="pages/view-listing.php?id=<?php echo (int) $listing['id']; ?>">View Details</a>
             </div>
           </article>
         <?php endforeach; ?>
       <?php endif; ?>
     </div>
   </section>
+  <script>
+    document.querySelectorAll('[data-user-menu]').forEach((menu) => {
+      const toggle = menu.querySelector('[data-user-menu-toggle]');
+      const dropdown = menu.querySelector('[data-user-dropdown]');
+
+      if (!toggle || !dropdown) {
+        return;
+      }
+
+      toggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const isOpen = menu.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      document.querySelectorAll('[data-user-menu]').forEach((menu) => {
+        if (menu.contains(event.target)) {
+          return;
+        }
+
+        menu.classList.remove('is-open');
+        const toggle = menu.querySelector('[data-user-menu-toggle]');
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    document.querySelectorAll('.listing-card').forEach((card) => {
+      const href = card.dataset.href;
+      if (!href) {
+        return;
+      }
+
+      card.addEventListener('click', (event) => {
+        if (event.target.closest('a')) {
+          return;
+        }
+
+        window.location.href = href;
+      });
+
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          window.location.href = href;
+        }
+      });
+    });
+  </script>
 </body>
 </html>

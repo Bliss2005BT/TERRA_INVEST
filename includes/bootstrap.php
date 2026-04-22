@@ -89,6 +89,44 @@ function getCurrentUserEmail(): string
     return $_SESSION['user_email'] ?? '';
 }
 
+function formatListingPrice(float $price): string
+{
+    return 'Rs. ' . number_format($price, 2);
+}
+
+function formatListingArea(float $area): string
+{
+    $squareFeet = number_format($area, 2) . ' sq ft';
+
+    if ($area >= 43560) {
+        return $squareFeet . ' / ' . number_format($area / 43560, 2) . ' acres';
+    }
+
+    return $squareFeet;
+}
+
+function formatListingLocation(string $location): string
+{
+    $parts = array_values(array_filter(array_map('trim', explode(',', $location)), static fn ($part): bool => $part !== ''));
+
+    if (count($parts) >= 2) {
+        return $parts[0] . ', ' . $parts[count($parts) - 1];
+    }
+
+    return $location;
+}
+
+function parseListingAmenities(string $amenities): array
+{
+    if (trim($amenities) === '') {
+        return [];
+    }
+
+    $items = preg_split('/[\r\n,]+/', $amenities) ?: [];
+
+    return array_values(array_filter(array_map('normalizeText', $items), static fn ($item): bool => $item !== ''));
+}
+
 function normalizePlanType(string $planType): string
 {
     return strtolower(normalizeText($planType));
@@ -354,16 +392,129 @@ function storeUploadedFile(array $file, string $targetDir, array $allowedExtensi
     ];
 }
 
+function deleteStoredAsset(string $path): void
+{
+    $normalizedPath = trim(str_replace('\\', '/', $path));
+    if ($normalizedPath === '') {
+        return;
+    }
+
+    $relativePath = null;
+    if (str_starts_with($normalizedPath, ROOT_IMAGE_UPLOAD_WEB)) {
+        $relativePath = substr($normalizedPath, strlen(ROOT_IMAGE_UPLOAD_WEB));
+        $baseDir = IMAGE_UPLOAD_DIR;
+    } elseif (str_starts_with($normalizedPath, ROOT_VIDEO_UPLOAD_WEB)) {
+        $relativePath = substr($normalizedPath, strlen(ROOT_VIDEO_UPLOAD_WEB));
+        $baseDir = VIDEO_UPLOAD_DIR;
+    } else {
+        return;
+    }
+
+    if ($relativePath === false || $relativePath === '' || preg_match('#(^|/)\.\.(/|$)#', $relativePath)) {
+        return;
+    }
+
+    $fullPath = realpath($baseDir . $relativePath);
+    $basePath = realpath($baseDir);
+    if ($fullPath && $basePath && str_starts_with(str_replace('\\', '/', $fullPath), str_replace('\\', '/', $basePath)) && is_file($fullPath)) {
+        unlink($fullPath);
+    }
+}
+
+function hydrateListingRow(array $listing): array
+{
+    $listing['subscription_type'] = normalizePlanType($listing['subscription_type'] ?? 'basic');
+    $listing['subscription_name'] = formatPlanName($listing['subscription_type']);
+    $listing['badge_label'] = getPlanBadgeLabel($listing['subscription_type']);
+    $listing['listing_expiry_date'] = getListingExpiryDate($listing['created_at'], $listing['subscription_type']);
+    $listing['image_list'] = json_decode($listing['images'] ?? '[]', true) ?: [];
+    $listing['image'] = $listing['image_list'][0] ?? '';
+
+    return $listing;
+}
+
+function getListingsForUser(int $userId): array
+{
+    $conn = getDBConnection();
+    $stmt = $conn->prepare(
+        'SELECT *
+         FROM listings
+         WHERE user_id = ?
+         ORDER BY created_at DESC, id DESC'
+    );
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $listings = [];
+
+    while ($listing = $result->fetch_assoc()) {
+        $listings[] = hydrateListingRow($listing);
+    }
+
+    $stmt->close();
+    closeDBConnection($conn);
+
+    return $listings;
+}
+
+function deleteListingForUser(int $listingId, int $userId): bool
+{
+    $conn = getDBConnection();
+    $selectStmt = $conn->prepare(
+        'SELECT images, video
+         FROM listings
+         WHERE id = ?
+           AND user_id = ?
+         LIMIT 1'
+    );
+    $selectStmt->bind_param('ii', $listingId, $userId);
+    $selectStmt->execute();
+    $result = $selectStmt->get_result();
+    $listing = $result->fetch_assoc() ?: null;
+    $selectStmt->close();
+
+    if (!$listing) {
+        closeDBConnection($conn);
+        return false;
+    }
+
+    $deleteStmt = $conn->prepare(
+        'DELETE FROM listings
+         WHERE id = ?
+           AND user_id = ?
+         LIMIT 1'
+    );
+    $deleteStmt->bind_param('ii', $listingId, $userId);
+    $deleteStmt->execute();
+    $deleted = $deleteStmt->affected_rows > 0;
+    $deleteStmt->close();
+    closeDBConnection($conn);
+
+    if ($deleted) {
+        $images = json_decode($listing['images'] ?? '[]', true);
+        if (is_array($images)) {
+            foreach ($images as $imagePath) {
+                deleteStoredAsset((string) $imagePath);
+            }
+        }
+
+        $videoPath = (string) ($listing['video'] ?? '');
+        if ($videoPath !== '' && !preg_match('/youtube\.com|youtu\.be/i', $videoPath)) {
+            deleteStoredAsset($videoPath);
+        }
+    }
+
+    return $deleted;
+}
+
 function getListingById(int $listingId): ?array
 {
     $conn = getDBConnection();
-    $activeListingSql = getListingActiveSql('l.created_at', 'l.subscription_type');
     $stmt = $conn->prepare(
         'SELECT l.*, u.name AS seller_name, u.email AS seller_email
          FROM listings l
          INNER JOIN users u ON u.id = l.user_id
-         WHERE ' . $activeListingSql . '
-           AND l.id = ?
+         WHERE l.id = ?
          LIMIT 1'
     );
     $stmt->bind_param('i', $listingId);
@@ -374,11 +525,7 @@ function getListingById(int $listingId): ?array
     closeDBConnection($conn);
 
     if ($listing) {
-        $listing['subscription_type'] = normalizePlanType($listing['subscription_type'] ?? 'basic');
-        $listing['subscription_name'] = formatPlanName($listing['subscription_type']);
-        $listing['badge_label'] = getPlanBadgeLabel($listing['subscription_type']);
-        $listing['listing_expiry_date'] = getListingExpiryDate($listing['created_at'], $listing['subscription_type']);
-        $listing['image_list'] = json_decode($listing['images'] ?? '[]', true) ?: [];
+        $listing = hydrateListingRow($listing);
     }
 
     return $listing;

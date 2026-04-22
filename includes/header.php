@@ -32,9 +32,18 @@ $flash = getFlash();
             <a href="../pages/subscription.php" class="listing-btn">
                 <?php echo $activeSubscription ? 'Add a Listing' : 'Choose Plan'; ?>
             </a>
-            <div class="right">
-                <i class="fa-solid fa-user"></i>
-                <span><?php echo esc(getCurrentUserName()); ?></span>
+            <div class="user-menu" data-user-menu>
+                <button type="button" class="user-menu-toggle" data-user-menu-toggle aria-expanded="false">
+                    <span class="right">
+                        <i class="fa-solid fa-user"></i>
+                        <span><?php echo esc(getCurrentUserName()); ?></span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down user-menu-chevron" aria-hidden="true"></i>
+                </button>
+                <div class="user-dropdown" data-user-dropdown>
+                    <a href="../my-listings.php" class="user-dropdown-link">View My Listings</a>
+                    <a href="../php/logout.php" class="user-dropdown-link user-dropdown-link-danger">Logout</a>
+                </div>
             </div>
         </div>
     </header>
