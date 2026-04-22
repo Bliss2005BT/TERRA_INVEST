@@ -2,7 +2,8 @@
 declare(strict_types=1);
 
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -72,6 +73,31 @@ function getSubscriptionPlans(): array
 function isUserLoggedIn(): bool
 {
     return !empty($_SESSION['user_id']);
+}
+
+function isJsonRequest(): bool
+{
+    $acceptHeader = strtolower((string) ($_SERVER['HTTP_ACCEPT'] ?? ''));
+    $requestedWith = strtolower((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? ''));
+
+    return str_contains($acceptHeader, 'application/json')
+        || $requestedWith === 'xmlhttprequest';
+}
+
+function respondJson(array $payload, int $statusCode = 200): void
+{
+    http_response_code($statusCode);
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode($payload);
+    exit();
+}
+
+function setAuthenticatedUser(array $user): void
+{
+    session_regenerate_id(true);
+    $_SESSION['user_id'] = (int) ($user['id'] ?? 0);
+    $_SESSION['user_name'] = normalizeText((string) ($user['name'] ?? ''));
+    $_SESSION['user_email'] = strtolower(trim((string) ($user['email'] ?? '')));
 }
 
 function getCurrentUserId(): ?int
@@ -231,7 +257,7 @@ function requireLogin(string $redirectPath = '../index.php'): void
 {
     if (!isUserLoggedIn()) {
         setFlash('error', 'Please log in to continue.');
-        redirectTo($redirectPath . '?error=' . urlencode('Please log in to continue.'));
+        redirectTo($redirectPath);
     }
 }
 

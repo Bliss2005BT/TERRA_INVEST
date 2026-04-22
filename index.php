@@ -7,6 +7,8 @@ if (isUserLoggedIn()) {
     redirectTo('search.php');
 }
 
+$flash = getFlash();
+
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +21,7 @@ if (isUserLoggedIn()) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/script.js"></script>
+    <script src="js/script.js" defer></script>
     <link rel="icon" type="image/png" href="assets/logo_black.png">
 </head>
 <body>
@@ -42,8 +44,8 @@ if (isUserLoggedIn()) {
 
             <div class="nav-actions">
                 <div id="auth-buttons">
-                    <a href="#" class="btn-login" onclick="login()">Login</a>
-                    <a href="#" class="btn-start" onclick="register()">Start investing</a>
+                    <a href="#" class="btn-login" onclick="login(); return false;">Login</a>
+                    <a href="#" class="btn-start" onclick="register(); return false;">Start investing</a>
                 </div>
                 <div class="hamburger" onclick="toggleMenu()">
                     <span></span>
@@ -189,36 +191,65 @@ if (isUserLoggedIn()) {
                 </div>
 
                 <div id="login-tab" class="tab-content active">
-                    <form action="php/login.php" method="POST" class="auth-form">
+                    <form action="php/login.php" method="POST" class="auth-form" id="login-form" data-auth-form="login" novalidate>
+                        <div class="auth-status" data-form-status aria-live="polite" hidden></div>
                         <div class="form-group">
-                            <input type="email" name="email" placeholder="Email ID" required>
+                            <input id="login-email" type="email" name="email" placeholder="Email ID" autocomplete="email" aria-label="Email ID">
+                            <p class="field-error" data-error-for="email" aria-live="polite"></p>
                         </div>
                         <div class="form-group">
-                            <input type="password" name="password" placeholder="Password" required>
+                            <div class="password-field">
+                                <input id="login-password" type="password" name="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+                                <button type="button" class="password-toggle" data-toggle-password aria-label="Show password">Show</button>
+                            </div>
+                            <p class="field-error" data-error-for="password" aria-live="polite"></p>
                         </div>
-                        <button type="submit" name="login" class="auth-submit">Login</button>
+                        <div class="auth-form-meta">
+                            <a href="mailto:tuscanojuan17@gmail.com?subject=Password%20reset%20request" class="forgot-password-link">Forgot Password?</a>
+                        </div>
+                        <button type="submit" name="login" class="auth-submit">
+                            <span class="auth-submit-label">Login</span>
+                            <span class="auth-submit-spinner" aria-hidden="true"></span>
+                        </button>
                     </form>
                 </div>
 
                 <div id="register-tab" class="tab-content">
-                    <form action="php/register.php" method="POST" class="auth-form">
+                    <form action="php/register.php" method="POST" class="auth-form" id="register-form" data-auth-form="register" novalidate>
+                        <div class="auth-status" data-form-status aria-live="polite" hidden></div>
                         <div class="form-group">
-                            <input type="text" name="name" placeholder="Full Name" required>
+                            <input id="register-name" type="text" name="name" placeholder="Full Name" autocomplete="name" aria-label="Full Name">
+                            <p class="field-error" data-error-for="name" aria-live="polite"></p>
                         </div>
                         <div class="form-group">
-                            <input type="email" name="email" placeholder="Email ID" required>
+                            <input id="register-email" type="email" name="email" placeholder="Email ID" autocomplete="email" aria-label="Email ID">
+                            <p class="field-error" data-error-for="email" aria-live="polite"></p>
                         </div>
                         <div class="form-group">
-                            <input type="password" name="password" placeholder="Password" required>
+                            <div class="password-field">
+                                <input id="register-password" type="password" name="password" placeholder="Password" autocomplete="new-password" aria-label="Password">
+                                <button type="button" class="password-toggle" data-toggle-password aria-label="Show password">Show</button>
+                            </div>
+                            <p class="field-error" data-error-for="password" aria-live="polite"></p>
                         </div>
                         <div class="form-group">
-                            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+                            <div class="password-field">
+                                <input id="register-confirm-password" type="password" name="confirm_password" placeholder="Confirm Password" autocomplete="new-password" aria-label="Confirm Password">
+                                <button type="button" class="password-toggle" data-toggle-password aria-label="Show password">Show</button>
+                            </div>
+                            <p class="field-error" data-error-for="confirm_password" aria-live="polite"></p>
                         </div>
-                        <button type="submit" name="register" class="auth-submit">Create Account</button>
+                        <button type="submit" name="register" class="auth-submit">
+                            <span class="auth-submit-label">Create Account</span>
+                            <span class="auth-submit-spinner" aria-hidden="true"></span>
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        window.authPageFlash = <?php echo json_encode($flash, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>;
+    </script>
 </body>
 </html>

@@ -4,6 +4,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/bootstrap.php';
 requireLogin('index.php');
 
+$flash = getFlash();
+
 $keyword = normalizeText($_GET['keyword'] ?? '');
 $location = normalizeText($_GET['location'] ?? '');
 $minPrice = normalizeText($_GET['min_price'] ?? '');
@@ -224,6 +226,39 @@ closeDBConnection($conn);
       <?php endif; ?>
     </div>
   </section>
+  <script>
+    window.searchPageFlash = <?php echo json_encode($flash, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>;
+
+    function showPageToast(message, type) {
+      if (!message) {
+        return;
+      }
+
+      let container = document.querySelector('.toast-stack');
+
+      if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-stack';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type === 'error' ? 'error' : 'success'}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      window.setTimeout(() => {
+        toast.remove();
+        if (!container.children.length) {
+          container.remove();
+        }
+      }, 4500);
+    }
+
+    if (window.searchPageFlash && window.searchPageFlash.message) {
+      showPageToast(window.searchPageFlash.message, window.searchPageFlash.type || 'success');
+    }
+  </script>
   <script>
     document.querySelectorAll('[data-user-menu]').forEach((menu) => {
       const toggle = menu.querySelector('[data-user-menu-toggle]');
