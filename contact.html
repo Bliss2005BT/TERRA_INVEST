@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Terra Invest &amp; Co.</title>
+    <meta name="description" content="Get in touch with Terra Invest &amp; Co. for land buying, selling, verification, investment, and legal inquiries.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/logo_black.png">
+    <style>
+        :root {
+            --white: #ffffff;
+            --surface: #f7f7f5;
+            --black: #0d0d0d;
+            --border: #e4e4e0;
+            --muted: #5d5d59;
+            --danger: #d92d20;
+            --danger-bg: #fff6f5;
+            --success: #18794e;
+            --success-bg: #eefaf3;
+            --shadow-soft: 0 24px 60px rgba(13, 13, 13, 0.08);
+            --focus-ring: 0 0 0 3px rgba(13, 13, 13, 0.08);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --radius-md: 16px;
+            --radius-pill: 999px;
+            --content-width: 1200px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(13, 13, 13, 0.035), transparent 28%),
+                linear-gradient(180deg, #ffffff 0%, #fcfcfb 100%);
+            color: var(--black);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        a,
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        .page-shell {
+            position: relative;
+        }
+
+        .page-shell::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(13, 13, 13, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(13, 13, 13, 0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 90%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header */
+        .header-wrapper {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            padding: 16px 0 0;
+        }
+
+        .floating-navbar {
+            width: min(90%, var(--content-width));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            box-shadow: 0 12px 40px rgba(13, 13, 13, 0.06);
+            backdrop-filter: blur(18px);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .nav-logo img {
+            width: auto;
+            height: 32px;
+        }
+
+        .logo-text {
+            color: var(--black);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.08rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        .nav-item {
+            position: relative;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.98rem;
+            font-weight: 500;
+            transition: color 0.25s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item:focus-visible,
+        .nav-item[aria-current="page"] {
+            color: var(--black);
+            outline: none;
+        }
+
+        .nav-item[aria-current="page"]::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 100%;
+            height: 2px;
+            background: var(--black);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        #auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login,
+        .btn-start {
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .btn-login {
+            padding: 8px 16px;
+            color: var(--black);
+        }
+
+        .btn-login:hover,
+        .btn-login:focus-visible {
+            background: var(--surface);
+            outline: none;
+        }
+
+        .btn-start {
+            padding: 10px 20px;
+            color: var(--white);
+            background: var(--black);
+            box-shadow: 0 10px 24px rgba(13, 13, 13, 0.12);
+        }
+
+        .btn-start:hover,
+        .btn-start:focus-visible {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(13, 13, 13, 0.16);
+            outline: none;
+        }
+
+        .hamburger,
+        .close-btn {
+            display: none;
+        }
+
+        .hamburger {
+            flex-direction: column;
+            gap: 4px;
+            background: transparent;
+            border: 0;
+            padding: 6px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--black);
+            border-radius: 999px;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            background: var(--white);
+            color: var(--black);
+            cursor: pointer;
+        }
+
+        .close-btn span {
+            font-size: 1.7rem;
+            line-height: 1;
+        }
+
+        /* Main layout */
+        .contact-page {
+            width: min(92%, var(--content-width));
+            margin: 0 auto;
+            padding: 56px 0 72px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: minmax(320px, 0.92fr) minmax(420px, 1.08fr);
+            gap: 36px;
+            align-items: start;
+        }
+
+        .contact-intro {
+            position: sticky;
+            top: 112px;
+            display: grid;
+            gap: 28px;
+            padding: 28px 0;
+        }
+
+        .tag {
+            width: fit-content;
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .intro-copy h1 {
+            max-width: 10ch;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(38px, 5vw, 56px);
+            font-weight: 600;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+        }
+
+        .intro-copy p {
+            max-width: 54ch;
+            margin-top: 16px;
+            color: var(--muted);
+            font-size: 1.04rem;
+        }
+
+        .contact-detail-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .detail-card {
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            gap: 16px;
+            padding: 18px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: 0 10px 30px rgba(13, 13, 13, 0.04);
+        }
+
+        .detail-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .detail-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .detail-content p,
+        .detail-content a {
+            color: var(--muted);
+            font-size: 0.98rem;
+            text-decoration: none;
+        }
+
+        .detail-content a:hover,
+        .detail-content a:focus-visible {
+            color: var(--black);
+            text-decoration: underline;
+            outline: none;
+        }
+
+        .form-panel {
+            position: relative;
+            padding: 32px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .form-panel::before {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: calc(var(--radius-lg) - 1px);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            pointer-events: none;
+        }
+
+        .form-header {
+            margin-bottom: 24px;
+        }
+
+        .form-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+
+        .form-header p {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .form-alert {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-size: 0.96rem;
+            font-weight: 500;
+        }
+
+        .form-alert.is-visible {
+            display: flex;
+        }
+
+        .form-alert.is-success {
+            color: var(--success);
+            background: var(--success-bg);
+            border: 1px solid rgba(24, 121, 78, 0.18);
+        }
+
+        .form-alert.is-error {
+            color: var(--danger);
+            background: var(--danger-bg);
+            border: 1px solid rgba(217, 45, 32, 0.18);
+        }
+
+        .form-alert-icon {
+            flex-shrink: 0;
+        }
+
+        .contact-form {
+            display: grid;
+            gap: 18px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field label,
+        .counter-row label {
+            color: var(--black);
+            font-size: 0.96rem;
+            font-weight: 500;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--white);
+            color: var(--black);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, transform 0.25s ease;
+        }
+
+        .field select {
+            appearance: none;
+            background-image:
+                linear-gradient(45deg, transparent 50%, #0d0d0d 50%),
+                linear-gradient(135deg, #0d0d0d 50%, transparent 50%);
+            background-position:
+                calc(100% - 22px) calc(50% - 3px),
+                calc(100% - 16px) calc(50% - 3px);
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+            padding-right: 44px;
+        }
+
+        .field textarea {
+            min-height: 170px;
+            resize: vertical;
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder {
+            color: #8a8a84;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--black);
+            box-shadow: var(--focus-ring);
+            outline: none;
+        }
+
+        .field.is-invalid input,
+        .field.is-invalid select,
+        .field.is-invalid textarea {
+            border-color: var(--danger);
+            background: var(--danger-bg);
+        }
+
+        .field.is-invalid input:focus,
+        .field.is-invalid select:focus,
+        .field.is-invalid textarea:focus {
+            box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12);
+        }
+
+        .field-help {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .field-error {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: var(--danger);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .field-error.is-visible {
+            display: inline-flex;
+        }
+
+        .field-error-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(217, 45, 32, 0.1);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .counter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .char-counter {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .char-counter.is-limit {
+            color: var(--black);
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 54px;
+            margin-top: 6px;
+            border: 0;
+            border-radius: var(--radius-pill);
+            background: var(--black);
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 14px 30px rgba(13, 13, 13, 0.14);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+        }
+
+        .submit-btn:hover:not(:disabled),
+        .submit-btn:focus-visible:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 36px rgba(13, 13, 13, 0.18);
+            outline: none;
+        }
+
+        .submit-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.88;
+        }
+
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.28);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .submit-btn.is-loading .spinner {
+            display: inline-flex;
+        }
+
+        .submit-note {
+            color: var(--muted);
+            font-size: 0.84rem;
+            text-align: center;
+        }
+
+        .footer-note {
+            width: min(92%, var(--content-width));
+            margin: 0 auto 28px;
+            padding-top: 12px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 920px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-intro {
+                position: static;
+                padding-bottom: 4px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-wrapper {
+                padding-top: 0;
+            }
+
+            .floating-navbar {
+                width: 100%;
+                border-radius: 0;
+                padding: 12px 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-links.mobile-open {
+                position: fixed;
+                inset: 0 0 0 auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                width: min(320px, 84vw);
+                height: 100vh;
+                padding: 92px 24px 24px;
+                background: rgba(255, 255, 255, 0.98);
+                border-left: 1px solid var(--border);
+                box-shadow: -18px 0 48px rgba(13, 13, 13, 0.08);
+                z-index: 1001;
+            }
+
+            .nav-links.mobile-open .close-btn {
+                display: inline-flex;
+            }
+
+            .nav-links.mobile-open .nav-item {
+                width: 100%;
+                padding: 10px 0;
+                text-align: center;
+            }
+
+            .nav-links.mobile-open .nav-item[aria-current="page"]::after {
+                left: 50%;
+                width: 56px;
+                transform: translateX(-50%);
+            }
+
+            .hamburger {
+                display: inline-flex;
+            }
+
+            .btn-start {
+                display: none;
+            }
+
+            .contact-page {
+                padding-top: 36px;
+            }
+
+            .form-panel {
+                padding: 24px;
+            }
+
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .logo-text {
+                font-size: 0.94rem;
+            }
+
+            .btn-login {
+                padding-inline: 10px;
+                font-size: 0.88rem;
+            }
+
+            .contact-page {
+                width: min(94%, var(--content-width));
+                padding-bottom: 48px;
+            }
+
+            .intro-copy h1 {
+                max-width: none;
+            }
+
+            .detail-card {
+                grid-template-columns: 52px 1fr;
+                padding: 16px;
+            }
+
+            .detail-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 16px;
+            }
+
+            .form-panel {
+                padding: 20px;
+                border-radius: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <header class="header-wrapper">
+            <nav class="floating-navbar" aria-label="Primary">
+                <div class="nav-logo">
+                    <img src="assets/logo_black.png" alt="Terra Invest Co.">
+                    <span class="logo-text">Terra Invest Co.</span>
+                </div>
+
+                <div class="nav-links" id="nav-links">
+                    <button class="close-btn" type="button" onclick="toggleMenu()" aria-label="Close navigation menu">
+                        <span>&times;</span>
+                    </button>
+                    <a href="index.html#about" class="nav-item">About</a>
+                    <a href="index.html#services" class="nav-item">Services</a>
+                    <a href="index.html#pricing" class="nav-item">Pricing</a>
+                    <a href="contact.html" class="nav-item" aria-current="page">Contact US</a>
+                </div>
+
+                <div class="nav-actions">
+                    <div id="auth-buttons">
+                        <a href="index.html" class="btn-login" onclick="login(); return false;">Login</a>
+                        <a href="index.html" class="btn-start" onclick="register(); return false;">Start investing</a>
+                    </div>
+                    <button class="hamburger" type="button" onclick="toggleMenu()" aria-expanded="false" aria-controls="nav-links" aria-label="Open navigation menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="contact-page">
+            <div class="contact-grid">
+                <aside class="contact-intro" aria-labelledby="contact-heading">
+                    <div class="tag">Contact / Terra Invest &amp; Co.</div>
+
+                    <div class="intro-copy">
+                        <h1 id="contact-heading">Let's talk land.</h1>
+                        <p>
+                            Whether you're exploring your first land acquisition or managing a high-value portfolio,
+                            our team can help you move with clarity, confidence, and verified insight.
+                        </p>
+                    </div>
+
+                    <div class="contact-detail-list">
+                        <article class="detail-card">
+                            <div class="detail-icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                    <path d="M7.5 4.5C7.5 3.948 7.948 3.5 8.5 3.5H11C11.552 3.5 12 3.948 12 4.5V6.143C12 6.568 11.731 6.946 11.329 7.087L9.95 7.569C9.441 7.747 9.149 8.279 9.283 8.801C10.005 11.622 12.208 13.825 15.029 14.547C15.551 14.681 16.083 14.389 16.261 13.88L16.743 12.501C16.884 12.099 17.262 11.83 17.687 11.83H19.5C20.052 11.83 20.5 12.278 20.5 12.83V15.33C20.5 15.882 20.052 16.33 19.5 16.33H18.3C10.665 16.33 4.5 10.165 4.5 2.53V1.5C4.5 0.948 4.948 0.5 5.5 0.5H7.5V4.5Z" transform="translate(-0.5 3.5)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <h2>Phone</h2>
+                                <a href="tel:+918446441988">+91 84464 41988</a>
+                                <p>Mon to Sat, 9:00 AM to 6:00 PM</p>
+                            </div>
+                        </article>
+
+                        <article class="detail-card">
+                            <div class="detail-icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                    <path d="M4 6.5C4 5.672 4.672 5 5.5 5H18.5C19.328 5 20 5.672 20 6.5V17.5C20 18.328 19.328 19 18.5 19H5.5C4.672 19 4 18.328 4 17.5V6.5Z" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M5 6L12 12L19 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <h2>Email</h2>
+                                <a href="mailto:tuscanojuan17@gmail.com">tuscanojuan17@gmail.com</a>
+                                <p>Replies typically within one business day</p>
+                            </div>
+                        </article>
+
+                        <article class="detail-card">
+                            <div class="detail-icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 21C15.866 17.418 18.5 14.308 18.5 10.5C18.5 6.91 15.59 4 12 4C8.41 4 5.5 6.91 5.5 10.5C5.5 14.308 8.134 17.418 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                    <circle cx="12" cy="10.5" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <h2>Office</h2>
+                                <p>Virar, Mumbai, Maharashtra - 401301</p>
+                                <p>Private consultations by appointment</p>
+                            </div>
+                        </article>
+                    </div>
+                </aside>
+
+                <section class="form-panel" aria-labelledby="form-heading">
+                    <div class="form-header">
+                        <h2 id="form-heading">Send an inquiry</h2>
+                        <p>Tell us what you need and we’ll route your request to the right land specialist.</p>
+                    </div>
+
+                    <div id="form-alert" class="form-alert" aria-live="polite" aria-atomic="true"></div>
+
+                    <form id="contact-form" class="contact-form" novalidate data-endpoint="">
+                        <div class="field-grid">
+                            <div class="field" data-field="fullName">
+                                <label for="full-name">Full Name</label>
+                                <input
+                                    id="full-name"
+                                    name="fullName"
+                                    type="text"
+                                    placeholder="Your full name"
+                                    autocomplete="name"
+                                    maxlength="80"
+                                    aria-required="true"
+                                    aria-invalid="false"
+                                    aria-describedby="full-name-error"
+                                    required
+                                >
+                                <p id="full-name-error" class="field-error" aria-live="polite">
+                                    <span class="field-error-icon" aria-hidden="true">!</span>
+                                    <span data-error-text></span>
+                                </p>
+                            </div>
+
+                            <div class="field" data-field="email">
+                                <label for="email">Email</label>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    autocomplete="email"
+                                    maxlength="120"
+                                    aria-required="true"
+                                    aria-invalid="false"
+                                    aria-describedby="email-error"
+                                    required
+                                >
+                                <p id="email-error" class="field-error" aria-live="polite">
+                                    <span class="field-error-icon" aria-hidden="true">!</span>
+                                    <span data-error-text></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="field-grid">
+                            <div class="field" data-field="phone">
+                                <label for="phone">Phone Number</label>
+                                <input
+                                    id="phone"
+                                    name="phone"
+                                    type="tel"
+                                    placeholder="+91 98765 43210"
+                                    autocomplete="tel"
+                                    inputmode="tel"
+                                    maxlength="24"
+                                    aria-required="true"
+                                    aria-invalid="false"
+                                    aria-describedby="phone-error"
+                                    required
+                                >
+                                <p id="phone-error" class="field-error" aria-live="polite">
+                                    <span class="field-error-icon" aria-hidden="true">!</span>
+                                    <span data-error-text></span>
+                                </p>
+                            </div>
+
+                            <div class="field" data-field="subject">
+                                <label for="subject">Subject</label>
+                                <input
+                                    id="subject"
+                                    name="subject"
+                                    type="text"
+                                    placeholder="What are you reaching out about?"
+                                    autocomplete="off"
+                                    maxlength="120"
+                                    aria-required="true"
+                                    aria-invalid="false"
+                                    aria-describedby="subject-error"
+                                    required
+                                >
+                                <p id="subject-error" class="field-error" aria-live="polite">
+                                    <span class="field-error-icon" aria-hidden="true">!</span>
+                                    <span data-error-text></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="field" data-field="inquiryType">
+                            <label for="inquiry-type">Inquiry Type</label>
+                            <select
+                                id="inquiry-type"
+                                name="inquiryType"
+                                aria-required="true"
+                                aria-invalid="false"
+                                aria-describedby="inquiry-type-error"
+                                required
+                            >
+                                <option value="">Select an inquiry type</option>
+                                <option value="Buying">Buying</option>
+                                <option value="Selling">Selling</option>
+                                <option value="Verification">Verification</option>
+                                <option value="Investment">Investment</option>
+                                <option value="Legal">Legal</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <p id="inquiry-type-error" class="field-error" aria-live="polite">
+                                <span class="field-error-icon" aria-hidden="true">!</span>
+                                <span data-error-text></span>
+                            </p>
+                        </div>
+
+                        <div class="field" data-field="message">
+                            <div class="counter-row">
+                                <label for="message">Message</label>
+                                <span id="message-counter" class="char-counter">0 / 1000</span>
+                            </div>
+                            <textarea
+                                id="message"
+                                name="message"
+                                placeholder="Share a few details about the land, location, budget, or timeline."
+                                maxlength="1000"
+                                aria-required="true"
+                                aria-invalid="false"
+                                aria-describedby="message-help message-error message-counter"
+                                required
+                            ></textarea>
+                            <p id="message-help" class="field-help">Include enough context so we can connect you with the right team quickly.</p>
+                            <p id="message-error" class="field-error" aria-live="polite">
+                                <span class="field-error-icon" aria-hidden="true">!</span>
+                                <span data-error-text></span>
+                            </p>
+                        </div>
+
+                        <button id="submit-button" class="submit-btn" type="submit">
+                            <span class="spinner" aria-hidden="true"></span>
+                            <span class="submit-label">Send message</span>
+                        </button>
+
+                        <p class="submit-note">Your information is handled securely and only used to respond to this inquiry.</p>
+                    </form>
+                </section>
+            </div>
+        </main>
+
+        <footer class="footer-note">
+            Terra Invest &amp; Co. helps buyers and sellers move through verified land opportunities with less friction.
+        </footer>
+    </div>
+
+    <script>
+        // Mobile navigation keeps the standalone page consistent with the home-page header behavior.
+        function toggleMenu() {
+            const navLinks = document.getElementById("nav-links");
+            const hamburger = document.querySelector(".hamburger");
+
+            if (!navLinks || !hamburger) {
+                return;
+            }
+
+            const isOpen = navLinks.classList.contains("mobile-open");
+            navLinks.classList.toggle("mobile-open", !isOpen);
+            hamburger.classList.toggle("active", !isOpen);
+            hamburger.setAttribute("aria-expanded", String(!isOpen));
+            document.body.classList.toggle("menu-open", !isOpen);
+        }
+
+        function login() {
+            window.location.href = "index.html";
+        }
+
+        function register() {
+            window.location.href = "index.html";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("contact-form");
+            const alertBox = document.getElementById("form-alert");
+            const submitButton = document.getElementById("submit-button");
+            const messageField = document.getElementById("message");
+            const charCounter = document.getElementById("message-counter");
+            const navLinks = document.getElementById("nav-links");
+            const hamburger = document.querySelector(".hamburger");
+
+            const validators = {
+                fullName(value) {
+                    if (!value.trim()) {
+                        return "Enter your full name.";
+                    }
+
+                    if (value.trim().length < 2) {
+                        return "Full name should be at least 2 characters.";
+                    }
+
+                    return "";
+                },
+                email(value) {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                    if (!value.trim()) {
+                        return "Enter your email address.";
+                    }
+
+                    if (!emailPattern.test(value.trim())) {
+                        return "Enter a valid email address.";
+                    }
+
+                    return "";
+                },
+                phone(value) {
+                    const phonePattern = /^\+?[0-9\s().-]{7,20}$/;
+                    const digits = value.replace(/\D/g, "");
+
+                    if (!value.trim()) {
+                        return "Enter your phone number.";
+                    }
+
+                    if (!phonePattern.test(value.trim()) || digits.length < 7 || digits.length > 15) {
+                        return "Enter a valid phone number.";
+                    }
+
+                    return "";
+                },
+                subject(value) {
+                    if (!value.trim()) {
+                        return "Enter a subject.";
+                    }
+
+                    if (value.trim().length < 3) {
+                        return "Subject should be at least 3 characters.";
+                    }
+
+                    return "";
+                },
+                inquiryType(value) {
+                    if (!value) {
+                        return "Select an inquiry type.";
+                    }
+
+                    return "";
+                },
+                message(value) {
+                    if (!value.trim()) {
+                        return "Tell us a bit more about your inquiry.";
+                    }
+
+                    if (value.trim().length < 20) {
+                        return "Message should be at least 20 characters.";
+                    }
+
+                    if (value.length > 1000) {
+                        return "Message must be 1000 characters or less.";
+                    }
+
+                    return "";
+                },
+            };
+
+            const fields = Array.from(form.querySelectorAll("[name]"));
+
+            function getFieldWrapper(fieldName) {
+                return form.querySelector(`[data-field="${fieldName}"]`);
+            }
+
+            function getErrorElement(fieldName) {
+                const wrapper = getFieldWrapper(fieldName);
+                return wrapper ? wrapper.querySelector(".field-error") : null;
+            }
+
+            function setFieldError(fieldName, message) {
+                const field = form.elements[fieldName];
+                const wrapper = getFieldWrapper(fieldName);
+                const errorElement = getErrorElement(fieldName);
+                const errorText = errorElement ? errorElement.querySelector("[data-error-text]") : null;
+                const hasError = Boolean(message);
+
+                if (wrapper) {
+                    wrapper.classList.toggle("is-invalid", hasError);
+                }
+
+                if (field) {
+                    field.setAttribute("aria-invalid", String(hasError));
+                }
+
+                if (errorElement && errorText) {
+                    errorText.textContent = message;
+                    errorElement.classList.toggle("is-visible", hasError);
+                }
+            }
+
+            function validateField(fieldName) {
+                const field = form.elements[fieldName];
+
+                if (!field || typeof validators[fieldName] !== "function") {
+                    return true;
+                }
+
+                const message = validators[fieldName](String(field.value || ""));
+                setFieldError(fieldName, message);
+                return message === "";
+            }
+
+            function validateForm() {
+                let isValid = true;
+                let firstInvalidField = null;
+
+                Object.keys(validators).forEach((fieldName) => {
+                    const fieldValid = validateField(fieldName);
+                    if (!fieldValid && !firstInvalidField) {
+                        firstInvalidField = form.elements[fieldName];
+                    }
+                    isValid = isValid && fieldValid;
+                });
+
+                if (firstInvalidField) {
+                    firstInvalidField.focus();
+                }
+
+                return isValid;
+            }
+
+            function clearAlert() {
+                alertBox.className = "form-alert";
+                alertBox.innerHTML = "";
+                alertBox.removeAttribute("role");
+            }
+
+            function showAlert(type, message) {
+                const isSuccess = type === "success";
+                const icon = isSuccess
+                    ? "<svg class=\"form-alert-icon\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\"><path d=\"M16.667 5L7.5 14.167L3.333 10\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>"
+                    : "<svg class=\"form-alert-icon\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\"><path d=\"M10 6.667V10.833\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"/><path d=\"M10 14.167H10.008\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"/><path d=\"M8.559 3.825L2.159 15.492A1 1 0 0 0 3.036 17H15.964A1 1 0 0 0 16.841 15.492L10.441 3.825A1 1 0 0 0 8.559 3.825Z\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linejoin=\"round\"/></svg>";
+
+                alertBox.className = `form-alert is-visible ${isSuccess ? "is-success" : "is-error"}`;
+                alertBox.setAttribute("role", isSuccess ? "status" : "alert");
+                alertBox.innerHTML = `${icon}<span>${message}</span>`;
+            }
+
+            function updateCounter() {
+                const currentLength = messageField.value.length;
+                charCounter.textContent = `${currentLength} / 1000`;
+                charCounter.classList.toggle("is-limit", currentLength >= 900);
+            }
+
+            function setSubmitting(isSubmitting) {
+                const label = submitButton.querySelector(".submit-label");
+
+                submitButton.disabled = isSubmitting;
+                submitButton.classList.toggle("is-loading", isSubmitting);
+                submitButton.setAttribute("aria-busy", String(isSubmitting));
+                label.textContent = isSubmitting ? "Sending..." : "Send message";
+            }
+
+            async function submitInquiry(payload) {
+                const endpoint = form.dataset.endpoint.trim();
+
+                // If no backend endpoint is configured yet, keep the UI fully testable with a mocked async success.
+                if (!endpoint) {
+                    await new Promise((resolve) => window.setTimeout(resolve, 1100));
+                    return { success: true };
+                }
+
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    throw new Error(data && data.message ? data.message : "We couldn't send your message right now. Please try again.");
+                }
+
+                return data;
+            }
+
+            function resetValidationState(options = {}) {
+                const preserveAlert = Boolean(options.preserveAlert);
+
+                Object.keys(validators).forEach((fieldName) => {
+                    setFieldError(fieldName, "");
+                });
+                if (!preserveAlert) {
+                    clearAlert();
+                }
+                updateCounter();
+            }
+
+            fields.forEach((field) => {
+                field.addEventListener("blur", () => {
+                    validateField(field.name);
+                });
+
+                field.addEventListener("input", () => {
+                    if (field.name === "message") {
+                        updateCounter();
+                    }
+
+                    if (field.getAttribute("aria-invalid") === "true") {
+                        validateField(field.name);
+                    }
+                });
+
+                field.addEventListener("change", () => {
+                    if (field.tagName === "SELECT") {
+                        validateField(field.name);
+                    }
+                });
+            });
+
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                clearAlert();
+
+                if (!validateForm()) {
+                    showAlert("error", "Please review the highlighted fields and try again.");
+                    return;
+                }
+
+                setSubmitting(true);
+
+                try {
+                    const formData = new FormData(form);
+                    const payload = Object.fromEntries(formData.entries());
+                    await submitInquiry(payload);
+
+                    form.reset();
+                    resetValidationState({ preserveAlert: true });
+                    showAlert("success", "Thanks for reaching out. Your inquiry has been sent successfully.");
+                } catch (error) {
+                    console.error("Contact form submission failed:", error);
+                    showAlert("error", error instanceof Error ? error.message : "Something went wrong. Please try again.");
+                } finally {
+                    setSubmitting(false);
+                }
+            });
+
+            // Close the mobile menu after selecting a navigation item or clicking outside of it.
+            document.querySelectorAll(".nav-item").forEach((link) => {
+                link.addEventListener("click", () => {
+                    if (navLinks.classList.contains("mobile-open")) {
+                        toggleMenu();
+                    }
+                });
+            });
+
+            document.addEventListener("click", (event) => {
+                if (
+                    navLinks.classList.contains("mobile-open")
+                    && !navLinks.contains(event.target)
+                    && !hamburger.contains(event.target)
+                ) {
+                    toggleMenu();
+                }
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && navLinks.classList.contains("mobile-open")) {
+                    toggleMenu();
+                }
+            });
+
+            updateCounter();
+        });
+    </script>
+</body>
+</html>

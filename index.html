@@ -6,7 +6,7 @@
     <title>Terra Invest & Co.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/script.js"></script>
 
@@ -25,15 +25,17 @@
                 <span>&times;</span>
             </div>
             <a href="#about" class="nav-item">About</a>
-            <a href="#features" class="nav-item">Features</a>
-            <a href="#pricing" class="nav-item">Pricing</a>
             <a href="#services" class="nav-item">Services</a>
+            <a href="#pricing" class="nav-item">Pricing</a>
+            <a href="contact.html" class="nav-item">Contact US</a>
         </div>
 
         <div class="nav-actions">
             <div id="auth-buttons">
-                <a href="#" class="btn-login" onclick="login()">Login</a>
-                <a href="#" class="btn-start" onclick="register()">Start investing</a>
+                <!-- Fix: prevent the `#` href from jumping the page before opening the modal. -->
+                <a href="#" class="btn-login" onclick="login(); return false;">Login</a>
+                <!-- Fix: prevent the `#` href from jumping the page before opening the modal. -->
+                <a href="#" class="btn-start" onclick="register(); return false;">Start investing</a>
             </div>
             <div class="hamburger" onclick="toggleMenu()">
                 <span></span>
@@ -63,7 +65,7 @@
 
     </div>
 </section>
-<section class="aim-wireframe">
+<section class="aim-wireframe" id="about">
   <div class="aim-wrapper">
 
     <!-- LEFT : Video -->
@@ -95,8 +97,8 @@
 
 </div>
 </section>
-<section class="services-wrapper">
-    <div class="services-content">
+<section class="services-wrapper" id="pricing">
+    <div class="services-content" id="services">
         <div class="services-grid">
             <div class="service">
                 <h3>Verified Land Listings</h3>
@@ -140,30 +142,31 @@
     <div class="footer-container">
         <div class="footer-section">
             <h3>Quick links</h3>
-            <a href="#home">home</a>
-            <a href="#packages">packages</a>
-            <a href="#query">query</a>
+            <!-- Fix: replace the placeholder link with the actual home page path. -->
+            <a href="index.html">home</a>
+            <a href="contact.html">query</a>
         </div>
 
         <div class="footer-section">
             <h3>Extra links</h3>
-            <a href="#contact">ask questions</a>
-            <a href="#">terms of use</a>
+            <a href="contact.html">ask questions</a>
             <a href="#">privacy policy</a>
         </div>
 
         <div class="footer-section">
             <h3>Contact Info</h3>
-            <p>+91 84464 41988</p>
-            <p>tuscanojuan17@gmail.com</p>
+            <!-- Fix: phone link should dial instead of opening the contact page. -->
+            <a href="tel:+918237216527">+91 82372 16527</a>
+            <!-- Fix: email link should use `mailto:` instead of a hard-coded Gmail compose URL. -->
+            <a href="mailto:terrainvest@gmail.com">terrainvest@gmail.com</a>
             <p>Virar, Mumbai, Maharashtra - 401301</p>
         </div>
 
         <div class="footer-section">
             <h3>Follow us</h3>
             <a href="#">Instagram</a>
-            <a href="#">LinkedIn</a>
-            <a href="#">GitHub</a>
+            <a href="#">Facebook</a>
+           
         </div>
     </div>
 

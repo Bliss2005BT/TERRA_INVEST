@@ -149,7 +149,8 @@ function setupAuthModal() {
         });
     });
 
-    document.querySelectorAll('[data-auth-form]').forEach((form) => {
+    document.querySelectorAll('.auth-form').forEach((form) => {
+        // Fix: index.html uses `.auth-form` without `data-auth-form`, so bind by class as a fallback.
         form.addEventListener('submit', handleAuthSubmit);
 
         form.querySelectorAll('input').forEach((input) => {
@@ -162,7 +163,9 @@ async function handleAuthSubmit(event) {
     event.preventDefault();
 
     const form = event.currentTarget;
-    const formType = form.dataset.authForm || 'login';
+    // Fix: infer the form type when `data-auth-form` is missing so login/register validation still runs.
+    const formType = form.dataset.authForm
+        || (form.querySelector('[name="confirm_password"]') ? 'register' : 'login');
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
     const errors = validateAuthForm(formType, payload);
@@ -260,6 +263,8 @@ function clearFormFeedback(form) {
 
     form.querySelectorAll('input').forEach((input) => {
         input.removeAttribute('aria-invalid');
+        // Fix: clear previous browser validation messages so stale errors do not block resubmission.
+        input.setCustomValidity('');
     });
 
     form.querySelectorAll('[data-error-for]').forEach((element) => {
@@ -289,6 +294,8 @@ function clearFieldError(form, fieldName) {
 
     if (input) {
         input.removeAttribute('aria-invalid');
+        // Fix: remove custom validity when the user edits the field so native validation can recover.
+        input.setCustomValidity('');
     }
 
     if (error) {
@@ -314,6 +321,8 @@ function applyFormErrors(form, errors) {
 
         if (input) {
             input.setAttribute('aria-invalid', 'true');
+            // Fix: provide a native validation message when inline error markup is absent in index.html.
+            input.setCustomValidity(String(message));
         }
 
         if (error) {
@@ -322,6 +331,8 @@ function applyFormErrors(form, errors) {
 
         if (index === 0 && input) {
             input.focus();
+            // Fix: surface the first error immediately even on the lightweight modal markup.
+            input.reportValidity();
         }
     });
 }
@@ -330,6 +341,8 @@ function setFormStatus(form, message, type) {
     const status = form.querySelector('[data-form-status]');
 
     if (!status) {
+        // Fix: fall back to toasts when the page has no dedicated status region.
+        showMessage(message, type);
         return;
     }
 
@@ -348,21 +361,36 @@ function setFormStatus(form, message, type) {
 function setSubmitState(form, isLoading) {
     const button = form.querySelector('.auth-submit');
     const label = button ? button.querySelector('.auth-submit-label') : null;
-    const formType = form.dataset.authForm || 'login';
+    // Fix: infer the form type when `data-auth-form` is missing so button loading copy stays correct.
+    const formType = form.dataset.authForm
+        || (form.querySelector('[name="confirm_password"]') ? 'register' : 'login');
 
-    if (!button || !label) {
+    if (!button) {
         return;
     }
 
-    if (!button.dataset.defaultLabel) {
-        button.dataset.defaultLabel = label.textContent;
+    if (label) {
+        if (!button.dataset.defaultLabel) {
+            button.dataset.defaultLabel = label.textContent;
+        }
+    } else if (!button.dataset.defaultLabel) {
+        // Fix: support buttons that use plain text instead of a nested `.auth-submit-label`.
+        button.dataset.defaultLabel = button.textContent.trim();
     }
 
     button.disabled = isLoading;
     button.classList.toggle('is-loading', isLoading);
-    label.textContent = isLoading
+
+    const nextLabel = isLoading
         ? (formType === 'register' ? 'Creating Account...' : 'Signing In...')
         : button.dataset.defaultLabel;
+
+    if (label) {
+        label.textContent = nextLabel;
+    } else {
+        // Fix: update plain-text submit buttons when the richer label span is not present.
+        button.textContent = nextLabel;
+    }
 }
 
 function loadSessionData() {
