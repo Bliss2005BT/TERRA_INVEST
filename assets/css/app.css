@@ -12,7 +12,7 @@
 
 .app-body {
     background: var(--page-bg);
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Inter', sans-serif;
     padding: 10px 18px 24px;
     color: var(--text-main);
 }
@@ -141,17 +141,9 @@
 
 .page-heading h1,
 .page-heading h2 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.page-heading h1 {
-    font-size: clamp(38px, 5vw, 56px);
-}
-
-.page-heading h2 {
+    font-family: 'Montserrat', sans-serif;
     font-size: clamp(1.8rem, 3vw, 2.4rem);
+    margin-bottom: 8px;
 }
 
 .page-heading p,
@@ -216,8 +208,7 @@
 .plan-card h3,
 .result-card h3,
 .detail-card h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
     margin-bottom: 10px;
 }
 
@@ -366,8 +357,7 @@
 
 .plan-section h4 {
     margin-bottom: 12px;
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .plan-section-muted {
@@ -477,9 +467,9 @@
 }
 
 .property-price {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1.8rem;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .property-panel {
@@ -561,9 +551,8 @@
 }
 
 .property-heading-main h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(38px, 5vw, 56px);
-    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
     margin-top: 10px;
     margin-bottom: 8px;
 }
@@ -598,9 +587,8 @@
 }
 
 .section-heading h2 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1.2rem;
-    font-weight: 600;
 }
 
 .section-heading p,
@@ -629,9 +617,8 @@
 }
 
 .key-detail-card strong {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
-    font-weight: 600;
 }
 
 .property-content-grid {
@@ -781,7 +768,7 @@
     color: #fff;
     font-size: 0.85rem;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.02em;
 }
 
 .badge-basic {
@@ -870,15 +857,8 @@
 
     .page-heading h1,
     .page-heading h2 {
-        line-height: 1.2;
-    }
-
-    .page-heading h1 {
-        font-size: clamp(38px, 5vw, 56px);
-    }
-
-    .page-heading h2 {
         font-size: 1.7rem;
+        line-height: 1.2;
     }
 
     .page-subtext,
@@ -958,10 +938,7 @@
         padding: 14px;
     }
 
-    .page-heading h1 {
-        font-size: clamp(38px, 5vw, 56px);
-    }
-
+    .page-heading h1,
     .page-heading h2 {
         font-size: 1.5rem;
     }
