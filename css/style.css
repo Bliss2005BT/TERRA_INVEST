@@ -11,7 +11,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body { 
-    font-family: 'Outfit', sans-serif; 
+    font-family: 'Inter', sans-serif; 
     line-height: 1.6; 
     background-color: #f2f0f0;
     margin: 0;
@@ -58,8 +58,8 @@ html {
 .nav-logo img { height: 32px; width: auto; }
 
 .logo-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
     font-size: 1.1rem;
     color: var(--brand-dark);
 }
@@ -311,9 +311,9 @@ html {
 }
 
 .main-display-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(38px, 5vw, 56px);
-    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2rem, 8vw, 4rem);
+    font-weight: 550;
     width: max-content;
     line-height: 0.95;
     letter-spacing: 2px;
@@ -322,7 +322,7 @@ html {
 }
 
 .description-text {
-      font-family: 'Outfit', sans-serif;
+      font-family: "Poppins", sans-serif;
     font-size: clamp(1rem, 3vw, 1.3rem);
     letter-spacing: 0.3px;
     width: fit-content;
@@ -342,7 +342,7 @@ html {
     border: none;
     padding: 16px 36px;
     border-radius: 100px;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
@@ -392,8 +392,8 @@ html {
         width: auto;
     }
     .logo-text {
-        font-family: 'Cormorant Garamond', serif;
-        font-weight: 600; /* Same as desktop */
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700; /* Same as desktop */
         font-size: 1rem;
         color: var(--brand-dark); /* Keep black text */
     }
@@ -427,7 +427,7 @@ html {
     }
 
     .main-display-title {
-        font-size: clamp(38px, 5vw, 56px);
+        font-size: clamp(2.2rem, 12vw, 3.2rem);
         line-height: 1;
         letter-spacing: 1px;
         text-align: left;
@@ -509,8 +509,8 @@ html {
     }
 
     .logo-text {
-        font-family: 'Cormorant Garamond', serif;
-        font-weight: 600; /* Same as desktop */
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700; /* Same as desktop */
         font-size: 0.9rem;
         color: var(--brand-dark); /* Keep black text */
     }
@@ -561,7 +561,7 @@ html {
     }
 
     .main-display-title {
-        font-size: clamp(38px, 5vw, 56px);
+        font-size: clamp(2rem, 14vw, 2.8rem);
         letter-spacing: 0.5px;
         margin-top: 0;
     }
@@ -583,7 +583,7 @@ html {
 .aim-wireframe {
   background-color: #ffffff;
   padding: 6rem 8%;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: #101a14;
   width: 100%;
 }
@@ -632,10 +632,8 @@ html {
 }
 
 .title-box h1 {
-  font-family: 'Cormorant Garamond', serif;
   color: #000000;
-  font-size: clamp(38px, 5vw, 56px);
-  font-weight: 600;
+  font-size: 02rem;
   text-align: left;
   max-width: 100%;
   margin: 0 auto;
@@ -685,7 +683,7 @@ html {
   }
 
   .title-box h1 {
-    font-size: clamp(38px, 5vw, 56px);
+    font-size: clamp(1.8rem, 7vw, 2.6rem);
   }
 
   .text-box p {
@@ -770,9 +768,9 @@ html {
 }
 
 .service h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.3rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--brand-dark);
   margin-bottom: 1rem;
   position: relative;
@@ -785,7 +783,7 @@ html {
 }
 
 .service p {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--text-muted);
@@ -829,9 +827,9 @@ html {
 }
 
 .our-services-content h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: clamp(1.8rem, 3vw, 2.2rem);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 1.5rem;
   color: white;
   position: relative;
@@ -840,7 +838,7 @@ html {
 }
 
 .our-services-content p {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(0.9rem, 1.5vw, 1rem);
   line-height: 1.6;
   margin-bottom: 2rem;
@@ -856,7 +854,7 @@ html {
   border: none;
   padding: 0.8rem 1.8rem;
   border-radius: 50px;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -972,9 +970,9 @@ footer::before {
 }
 
 .footer-section h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.4rem;
-  font-weight: 600;
+  font-weight: 700;
   color: white;
   margin-bottom: 1.5rem;
   position: relative;
@@ -984,7 +982,7 @@ footer::before {
   display: block;
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   line-height: 2;
   transition: all 0.3s ease;
@@ -998,7 +996,7 @@ footer::before {
 
 .footer-section p {
   color: rgba(255, 255, 255, 0.8);
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   line-height: 1.8;
   margin-bottom: 0.5rem;
@@ -1013,7 +1011,7 @@ footer::before {
 }
 
 .footer-bottom p {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.6);
   margin: 0;
@@ -1128,9 +1126,9 @@ footer::before {
 }
 
 .modal-header h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--brand-dark);
   margin: 0;
 }
@@ -1166,7 +1164,7 @@ footer::before {
   padding: 12px 0;
   background: none;
   border: none;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -1197,7 +1195,7 @@ footer::before {
   margin-bottom: 16px;
   padding: 12px 14px;
   border-radius: 10px;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.92rem;
   font-weight: 600;
 }
@@ -1221,7 +1219,7 @@ footer::before {
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.92rem;
   font-weight: 600;
   color: #262626;
@@ -1232,7 +1230,7 @@ footer::before {
   padding: 12px 16px;
   border: 2px solid #e5e5e5;
   border-radius: 8px;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 1rem;
   background: #fff;
   transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
@@ -1269,7 +1267,7 @@ footer::before {
   border: none;
   background: none;
   padding: 4px;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--brand-dark);
@@ -1283,7 +1281,7 @@ footer::before {
 .field-error {
   min-height: 18px;
   margin: 8px 0 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.84rem;
   font-weight: 500;
   color: #dc2626;
@@ -1296,7 +1294,7 @@ footer::before {
 }
 
 .forgot-password-link {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--brand-dark);
@@ -1315,7 +1313,7 @@ footer::before {
   color: white;
   border: none;
   border-radius: 8px;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -1381,7 +1379,7 @@ footer::before {
   padding: 14px 16px;
   border-radius: 14px;
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.45;
