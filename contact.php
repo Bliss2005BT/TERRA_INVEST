@@ -840,16 +840,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button class="close-btn" type="button" onclick="toggleMenu()" aria-label="Close navigation menu">
                         <span>&times;</span>
                     </button>
-                    <a href="index.html#about" class="nav-item">About</a>
-                    <a href="index.html#services" class="nav-item">Services</a>
-                    <a href="index.html#pricing" class="nav-item">Pricing</a>
+                    <a href="index.php#about" class="nav-item">About</a>
+                    <a href="index.php#services" class="nav-item">Services</a>
+                    <a href="index.php#pricing" class="nav-item">Pricing</a>
                     <a href="contact.php" class="nav-item" aria-current="page">Contact US</a>
                 </div>
 
                 <div class="nav-actions">
                     <div id="auth-buttons">
-                        <a href="index.html" class="btn-login" onclick="login(); return false;">Login</a>
-                        <a href="index.html" class="btn-start" onclick="register(); return false;">Start investing</a>
+                        <a href="index.php" class="btn-login" onclick="login(); return false;">Login</a>
+                        <a href="index.php" class="btn-start" onclick="register(); return false;">Start investing</a>
                     </div>
                     <button class="hamburger" type="button" onclick="toggleMenu()" aria-expanded="false" aria-controls="nav-links" aria-label="Open navigation menu">
                         <span></span>
@@ -1099,11 +1099,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function login() {
-            window.location.href = "index.html";
+            window.location.href = "index.php";
         }
 
         function register() {
-            window.location.href = "index.html";
+            window.location.href = "index.php";
         }
 
         document.addEventListener("DOMContentLoaded", () => {
