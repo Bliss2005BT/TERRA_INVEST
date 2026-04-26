@@ -19,6 +19,7 @@ $formData = [
     'youtube_link' => '',
 ];
 $errors = [];
+$uploadedDocumentPaths = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($formData as $key => $value) {
@@ -80,6 +81,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'External links are available only on the Featured plan.';
     }
 
+    $documentFields = [
+        'document_7_12' => '7/12 Extract',
+        'document_ferfar' => 'Ferfar',
+        'document_title_report' => 'Title Report',
+    ];
+    $hasAtLeastOneDocument = false;
+    foreach ($documentFields as $fieldName => $label) {
+        if (!empty($_FILES[$fieldName]['name'])) {
+            $hasAtLeastOneDocument = true;
+            break;
+        }
+    }
+
+    if (!$hasAtLeastOneDocument) {
+        $errors[] = 'Please upload at least one document';
+    }
+
     $imagePaths = [];
     if (!$errors) {
         $imageCount = count($_FILES['images']['name']);
@@ -135,6 +153,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors) {
+        foreach ($documentFields as $fieldName => $label) {
+            if (empty($_FILES[$fieldName]['name'])) {
+                continue;
+            }
+
+            $upload = storeDocumentFile($_FILES[$fieldName]);
+            if (!$upload['success']) {
+                $errors[] = $upload['message'];
+                break;
+            }
+
+            $uploadedDocumentPaths[$fieldName] = $upload['path'];
+        }
+    }
+
+    if ($errors && $uploadedDocumentPaths) {
+        foreach ($uploadedDocumentPaths as $documentPath) {
+            deleteStoredAsset($documentPath);
+        }
+        $uploadedDocumentPaths = [];
+    }
+
+    if (!$errors) {
         $location = $formData['city'] . ', ' . $formData['state'];
         $userId = getCurrentUserId();
         $imagesJson = json_encode($imagePaths);
@@ -167,12 +208,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $listingId = $stmt->insert_id;
             $stmt->close();
             closeDBConnection($conn);
-            setFlash('success', 'Listing created successfully.');
+
+            saveListingDocuments($listingId, [
+                'document_7_12' => [
+                    'path' => $uploadedDocumentPaths['document_7_12'] ?? '',
+                    'status' => 'Available',
+                ],
+                'document_ferfar' => [
+                    'path' => $uploadedDocumentPaths['document_ferfar'] ?? '',
+                    'status' => 'Updated',
+                ],
+                'document_title_report' => [
+                    'path' => $uploadedDocumentPaths['document_title_report'] ?? '',
+                    'status' => 'Verified',
+                ],
+            ]);
+
+            setFlash('success', 'Document uploaded successfully');
             redirectTo('../pages/view-listing.php?id=' . $listingId);
         }
 
         $stmt->close();
         closeDBConnection($conn);
+        foreach ($uploadedDocumentPaths as $documentPath) {
+            deleteStoredAsset($documentPath);
+        }
         $errors[] = 'Unable to save your listing right now.';
     }
 }
@@ -264,10 +324,35 @@ require_once __DIR__ . '/../includes/header.php';
                     <label for="youtube_link">Or External Link</label>
                     <input type="url" id="youtube_link" name="youtube_link" value="<?php echo esc($formData['youtube_link']); ?>" placeholder="https://maps.google.com/... or https://yourportfolio.com/..." <?php echo !empty($subscription['youtube_allowed']) ? '' : 'disabled'; ?>>
                 </div>
+                <div class="field-group full-width">
+                    <label>Documents</label>
+                    <div class="document-upload-grid">
+                        <div class="document-upload-item">
+                            <label for="document_7_12">7/12 Extract</label>
+                            <input type="file" id="document_7_12" name="document_7_12" accept=".pdf,.jpg,.jpeg,.png" data-document-input>
+                            <div class="document-meta" data-document-meta="document_7_12"></div>
+                        </div>
+                        <div class="document-upload-item">
+                            <label for="document_ferfar">Ferfar</label>
+                            <input type="file" id="document_ferfar" name="document_ferfar" accept=".pdf,.jpg,.jpeg,.png" data-document-input>
+                            <div class="document-meta" data-document-meta="document_ferfar"></div>
+                        </div>
+                        <div class="document-upload-item">
+                            <label for="document_title_report">Title Report</label>
+                            <input type="file" id="document_title_report" name="document_title_report" accept=".pdf,.jpg,.jpeg,.png" data-document-input>
+                            <div class="document-meta" data-document-meta="document_title_report"></div>
+                        </div>
+                    </div>
+                    <span class="helper-text">Allowed: PDF, JPG, PNG. Maximum 5 MB per file.</span>
+                    <div class="form-alert error document-error" id="document-error-banner" hidden></div>
+                    <div class="upload-progress" id="document-upload-progress" hidden>
+                        <div class="upload-progress-bar" id="document-upload-progress-bar"></div>
+                    </div>
+                </div>
             </div>
 
             <div>
-                <button type="submit" class="btn-dark">Publish Listing</button>
+                <button type="submit" class="btn-dark" id="publish-listing-btn">Publish Listing</button>
             </div>
         </form>
     </section>

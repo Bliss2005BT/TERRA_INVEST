@@ -14,10 +14,13 @@ require_once __DIR__ . '/../config/db.php';
 const APP_NAME = 'Terra Invest Co.';
 const IMAGE_UPLOAD_DIR = __DIR__ . '/../assets/uploads/images/';
 const VIDEO_UPLOAD_DIR = __DIR__ . '/../assets/uploads/videos/';
+const DOCUMENT_UPLOAD_DIR = __DIR__ . '/../uploads/documents/';
 const ROOT_IMAGE_UPLOAD_WEB = 'assets/uploads/images/';
 const ROOT_VIDEO_UPLOAD_WEB = 'assets/uploads/videos/';
+const ROOT_DOCUMENT_UPLOAD_WEB = 'uploads/documents/';
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 20 * 1024 * 1024;
+const MAX_DOCUMENT_SIZE = 5 * 1024 * 1024;
 
 function getSubscriptionPlans(): array
 {
@@ -377,6 +380,15 @@ function buildUploadName(string $originalName): string
     return uniqid('file_', true) . '.' . $extension;
 }
 
+function sanitizeUploadedBaseName(string $originalName): string
+{
+    $baseName = basename($originalName);
+    $baseName = preg_replace('/[^A-Za-z0-9._-]/', '_', $baseName) ?? '';
+    $baseName = trim($baseName, '._-');
+
+    return $baseName !== '' ? $baseName : 'document';
+}
+
 function storeUploadedFile(array $file, string $targetDir, array $allowedExtensions, int $maxSize, string $webPrefix): array
 {
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
@@ -425,6 +437,67 @@ function storeUploadedFile(array $file, string $targetDir, array $allowedExtensi
     ];
 }
 
+function storeDocumentFile(array $file): array
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        return ['success' => false, 'message' => 'Upload failed. Try again'];
+    }
+
+    if (($file['size'] ?? 0) > MAX_DOCUMENT_SIZE) {
+        return ['success' => false, 'message' => 'File size must be less than 5MB'];
+    }
+
+    $originalName = sanitizeUploadedBaseName((string) ($file['name'] ?? ''));
+    $nameParts = explode('.', $originalName);
+    if (count($nameParts) > 2) {
+        return ['success' => false, 'message' => 'Only PDF, JPG, PNG files are allowed'];
+    }
+
+    $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+    $allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+    if (!in_array($extension, $allowedExtensions, true)) {
+        return ['success' => false, 'message' => 'Only PDF, JPG, PNG files are allowed'];
+    }
+
+    $dangerousExtensions = ['php', 'php3', 'php4', 'php5', 'php7', 'phtml', 'phar', 'exe', 'sh', 'bat', 'cmd', 'com', 'js', 'jsp', 'asp', 'aspx'];
+    foreach ($nameParts as $index => $part) {
+        if ($index === count($nameParts) - 1) {
+            continue;
+        }
+
+        if (in_array(strtolower($part), $dangerousExtensions, true)) {
+            return ['success' => false, 'message' => 'Only PDF, JPG, PNG files are allowed'];
+        }
+    }
+
+    $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png'];
+    $detectedMime = '';
+    if (function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo) {
+            $detectedMime = (string) finfo_file($finfo, (string) ($file['tmp_name'] ?? ''));
+            finfo_close($finfo);
+        }
+    }
+
+    if ($detectedMime === '' || !in_array($detectedMime, $allowedMimes, true)) {
+        return ['success' => false, 'message' => 'Only PDF, JPG, PNG files are allowed'];
+    }
+
+    ensureUploadDirectory(DOCUMENT_UPLOAD_DIR);
+    $storedName = uniqid('', true) . '_' . $originalName;
+    $destination = DOCUMENT_UPLOAD_DIR . $storedName;
+
+    if (!move_uploaded_file((string) ($file['tmp_name'] ?? ''), $destination)) {
+        return ['success' => false, 'message' => 'Upload failed. Try again'];
+    }
+
+    return [
+        'success' => true,
+        'path' => ROOT_DOCUMENT_UPLOAD_WEB . $storedName,
+    ];
+}
+
 function deleteStoredAsset(string $path): void
 {
     $normalizedPath = trim(str_replace('\\', '/', $path));
@@ -439,6 +512,9 @@ function deleteStoredAsset(string $path): void
     } elseif (str_starts_with($normalizedPath, ROOT_VIDEO_UPLOAD_WEB)) {
         $relativePath = substr($normalizedPath, strlen(ROOT_VIDEO_UPLOAD_WEB));
         $baseDir = VIDEO_UPLOAD_DIR;
+    } elseif (str_starts_with($normalizedPath, ROOT_DOCUMENT_UPLOAD_WEB)) {
+        $relativePath = substr($normalizedPath, strlen(ROOT_DOCUMENT_UPLOAD_WEB));
+        $baseDir = DOCUMENT_UPLOAD_DIR;
     } else {
         return;
     }
@@ -490,9 +566,101 @@ function getListingsForUser(int $userId): array
     return $listings;
 }
 
+function ensureListingDocumentsTable(mysqli $conn): void
+{
+    static $isEnsured = false;
+    if ($isEnsured) {
+        return;
+    }
+
+    $conn->query(
+        'CREATE TABLE IF NOT EXISTS listing_documents (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            listing_id INT NOT NULL,
+            doc_type VARCHAR(64) NOT NULL,
+            file_path VARCHAR(255) NOT NULL,
+            verification_status VARCHAR(64) NOT NULL DEFAULT "Available",
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_listing_documents_listing_id (listing_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+
+    $isEnsured = true;
+}
+
+function saveListingDocuments(int $listingId, array $documents): void
+{
+    if ($listingId <= 0 || $documents === []) {
+        return;
+    }
+
+    $conn = getDBConnection();
+    ensureListingDocumentsTable($conn);
+
+    $deleteStmt = $conn->prepare('DELETE FROM listing_documents WHERE listing_id = ?');
+    $deleteStmt->bind_param('i', $listingId);
+    $deleteStmt->execute();
+    $deleteStmt->close();
+
+    $insertStmt = $conn->prepare(
+        'INSERT INTO listing_documents (listing_id, doc_type, file_path, verification_status)
+         VALUES (?, ?, ?, ?)'
+    );
+
+    foreach ($documents as $docType => $docData) {
+        $filePath = trim((string) ($docData['path'] ?? ''));
+        if ($filePath === '') {
+            continue;
+        }
+
+        $status = trim((string) ($docData['status'] ?? 'Available'));
+        if ($status === '') {
+            $status = 'Available';
+        }
+
+        $insertStmt->bind_param('isss', $listingId, $docType, $filePath, $status);
+        $insertStmt->execute();
+    }
+
+    $insertStmt->close();
+    closeDBConnection($conn);
+}
+
+function getListingDocuments(int $listingId): array
+{
+    if ($listingId <= 0) {
+        return [];
+    }
+
+    $conn = getDBConnection();
+    ensureListingDocumentsTable($conn);
+    $stmt = $conn->prepare(
+        'SELECT doc_type, file_path, verification_status
+         FROM listing_documents
+         WHERE listing_id = ?'
+    );
+    $stmt->bind_param('i', $listingId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $documents = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $documents[(string) $row['doc_type']] = [
+            'path' => (string) ($row['file_path'] ?? ''),
+            'status' => (string) ($row['verification_status'] ?? ''),
+        ];
+    }
+
+    $stmt->close();
+    closeDBConnection($conn);
+
+    return $documents;
+}
+
 function deleteListingForUser(int $listingId, int $userId): bool
 {
     $conn = getDBConnection();
+    ensureListingDocumentsTable($conn);
     $selectStmt = $conn->prepare(
         'SELECT images, video
          FROM listings
@@ -521,7 +689,6 @@ function deleteListingForUser(int $listingId, int $userId): bool
     $deleteStmt->execute();
     $deleted = $deleteStmt->affected_rows > 0;
     $deleteStmt->close();
-    closeDBConnection($conn);
 
     if ($deleted) {
         $images = json_decode($listing['images'] ?? '[]', true);
@@ -535,7 +702,27 @@ function deleteListingForUser(int $listingId, int $userId): bool
         if ($videoPath !== '' && !isExternalUrl($videoPath)) {
             deleteStoredAsset($videoPath);
         }
+
+        $docStmt = $conn->prepare(
+            'SELECT file_path
+             FROM listing_documents
+             WHERE listing_id = ?'
+        );
+        $docStmt->bind_param('i', $listingId);
+        $docStmt->execute();
+        $docResult = $docStmt->get_result();
+        while ($doc = $docResult->fetch_assoc()) {
+            deleteStoredAsset((string) ($doc['file_path'] ?? ''));
+        }
+        $docStmt->close();
+
+        $deleteDocStmt = $conn->prepare('DELETE FROM listing_documents WHERE listing_id = ?');
+        $deleteDocStmt->bind_param('i', $listingId);
+        $deleteDocStmt->execute();
+        $deleteDocStmt->close();
     }
+
+    closeDBConnection($conn);
 
     return $deleted;
 }
@@ -559,6 +746,13 @@ function getListingById(int $listingId): ?array
 
     if ($listing) {
         $listing = hydrateListingRow($listing);
+        $documents = getListingDocuments((int) $listing['id']);
+        $listing['document_7_12'] = (string) ($documents['document_7_12']['path'] ?? '');
+        $listing['document_ferfar'] = (string) ($documents['document_ferfar']['path'] ?? '');
+        $listing['document_title_report'] = (string) ($documents['document_title_report']['path'] ?? '');
+        $listing['document_status_7_12'] = (string) ($documents['document_7_12']['status'] ?? 'Available');
+        $listing['document_status_ferfar'] = (string) ($documents['document_ferfar']['status'] ?? 'Updated');
+        $listing['document_status_title_report'] = (string) ($documents['document_title_report']['status'] ?? 'Verified');
     }
 
     return $listing;
