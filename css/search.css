@@ -2,7 +2,7 @@
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 :root{
@@ -152,8 +152,7 @@ body{
   display:flex;
   align-items:center;
   gap:10px;
-  font-family: 'Cormorant Garamond', serif;
-  font-weight:600;
+  font-weight:700;
   font-size:18px;
   color:#111;
 }
@@ -212,9 +211,7 @@ body{
 
 /* TEXT */
 .main-box h1{
-  font-family: 'Cormorant Garamond', serif;
-  font-size:clamp(38px, 5vw, 56px);
-  font-weight:600;
+  font-size:32px;
   margin-bottom:10px;
 }
 
@@ -322,7 +319,7 @@ body{
   }
 
   .main-box h1{
-    font-size:clamp(38px, 5vw, 56px);
+    font-size:26px;
   }
 }
 
@@ -398,7 +395,7 @@ body{
   }
 
   .main-box h1{
-    font-size:clamp(38px, 5vw, 56px);
+    font-size:24px;
     line-height:1.2;
     margin-bottom:8px;
   }
@@ -581,9 +578,7 @@ body{
 }
 
 .results-header h2{
-  font-family: 'Cormorant Garamond', serif;
   font-size:28px;
-  font-weight:600;
   margin-bottom:6px;
 }
 
@@ -683,7 +678,7 @@ body{
   font-size:12px;
   font-weight:700;
   text-transform:uppercase;
-  letter-spacing:0.18em;
+  letter-spacing:0.04em;
   white-space:nowrap;
 }
 
