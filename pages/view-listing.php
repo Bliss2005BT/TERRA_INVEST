@@ -53,6 +53,10 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="video-frame">
                             <iframe src="<?php echo esc($embedUrl); ?>" allowfullscreen></iframe>
                         </div>
+                    <?php elseif (isExternalUrl((string) $listing['video'])): ?>
+                        <div class="media-card" style="display: grid; place-items: center; min-height: 160px;">
+                            <a href="<?php echo esc($listing['video']); ?>" target="_blank" rel="noopener noreferrer" class="btn-outline">Open External Link</a>
+                        </div>
                     <?php else: ?>
                         <div class="media-card">
                             <video controls>

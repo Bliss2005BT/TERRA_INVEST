@@ -345,16 +345,23 @@ function normalizeText(string $value): string
     return trim(preg_replace('/\s+/', ' ', $value));
 }
 
-function validateYouTubeUrl(string $url): bool
+function validateExternalUrl(string $url): bool
 {
     if ($url === '') {
         return true;
     }
 
-    return (bool) preg_match(
-        '/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[A-Za-z0-9_-]{6,}$/',
-        $url
-    );
+    if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+        return false;
+    }
+
+    $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+    return in_array($scheme, ['http', 'https'], true);
+}
+
+function isExternalUrl(string $value): bool
+{
+    return (bool) preg_match('/^https?:\/\//i', $value);
 }
 
 function ensureUploadDirectory(string $path): void
@@ -525,7 +532,7 @@ function deleteListingForUser(int $listingId, int $userId): bool
         }
 
         $videoPath = (string) ($listing['video'] ?? '');
-        if ($videoPath !== '' && !preg_match('/youtube\.com|youtu\.be/i', $videoPath)) {
+        if ($videoPath !== '' && !isExternalUrl($videoPath)) {
             deleteStoredAsset($videoPath);
         }
     }
