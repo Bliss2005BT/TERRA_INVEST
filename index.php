@@ -37,7 +37,7 @@ $flash = getFlash();
                     <span>&times;</span>
                 </div>
                 <a href="#about" class="nav-item">About</a>
-                <a href="#features" class="nav-item">Features</a>
+                <a href="contact.php" class="nav-item">Contact US</a>
                 <a href="#pricing" class="nav-item">Pricing</a>
                 <a href="#services" class="nav-item">Services</a>
             </div>
