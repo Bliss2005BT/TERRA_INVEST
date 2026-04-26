@@ -19,7 +19,7 @@ $flash = getFlash();
     <title>Terra Invest & Co.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/script.js" defer></script>
     <link rel="icon" type="image/png" href="assets/logo_black.png">
@@ -37,7 +37,7 @@ $flash = getFlash();
                     <span>&times;</span>
                 </div>
                 <a href="#about" class="nav-item">About</a>
-                <a href="#features" class="nav-item">Features</a>
+                <a href="contact.php" class="nav-item">Contact US</a>
                 <a href="#pricing" class="nav-item">Pricing</a>
                 <a href="#services" class="nav-item">Services</a>
             </div>

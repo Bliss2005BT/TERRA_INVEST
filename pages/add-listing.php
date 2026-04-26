@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Description is required.';
     }
 
-    if (!validateYouTubeUrl($formData['youtube_link'])) {
-        $errors[] = 'Enter a valid YouTube link.';
+    if (!validateExternalUrl($formData['youtube_link'])) {
+        $errors[] = 'Enter a valid link (http/https).';
     }
 
     $selectedImageCount = 0;
@@ -70,14 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $hasUploadedVideo = !empty($_FILES['video']['name']);
-    $hasYouTubeLink = $formData['youtube_link'] !== '';
+    $hasExternalLink = $formData['youtube_link'] !== '';
 
     if ($hasUploadedVideo && !$subscription['video_allowed']) {
         $errors[] = 'Video upload is not available on the ' . $subscription['plan_name'] . ' plan.';
     }
 
-    if ($hasYouTubeLink && empty($subscription['youtube_allowed'])) {
-        $errors[] = 'YouTube links are available only on the Featured plan.';
+    if ($hasExternalLink && empty($subscription['youtube_allowed'])) {
+        $errors[] = 'External links are available only on the Featured plan.';
     }
 
     $imagePaths = [];
@@ -130,8 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    if (!$errors && $videoPath !== '' && $hasYouTubeLink) {
-        $errors[] = 'Please upload a video or provide a YouTube link, not both.';
+    if (!$errors && $videoPath !== '' && $hasExternalLink) {
+        $errors[] = 'Please upload a video or provide an external link, not both.';
     }
 
     if (!$errors) {
@@ -198,7 +198,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <h3>Publishing Limits</h3>
                 <p>Images allowed: <strong><?php echo ($subscription['image_limit'] ?? 0) > 0 ? esc((string) $subscription['image_limit']) : 'Unlimited'; ?></strong></p>
                 <p>Video upload: <strong><?php echo $subscription['video_allowed'] ? 'Yes' : 'No'; ?></strong></p>
-                <p>YouTube link: <strong><?php echo !empty($subscription['youtube_allowed']) ? 'Yes' : 'No'; ?></strong></p>
+                <p>External link: <strong><?php echo !empty($subscription['youtube_allowed']) ? 'Yes' : 'No'; ?></strong></p>
             </article>
         </div>
 
@@ -261,8 +261,8 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="helper-text"><?php echo $subscription['video_allowed'] ? 'Optional. Maximum 20 MB.' : 'Not available on your current plan.'; ?></span>
                 </div>
                 <div class="field-group">
-                    <label for="youtube_link">Or YouTube Link</label>
-                    <input type="url" id="youtube_link" name="youtube_link" value="<?php echo esc($formData['youtube_link']); ?>" placeholder="https://www.youtube.com/watch?v=..." <?php echo !empty($subscription['youtube_allowed']) ? '' : 'disabled'; ?>>
+                    <label for="youtube_link">Or External Link</label>
+                    <input type="url" id="youtube_link" name="youtube_link" value="<?php echo esc($formData['youtube_link']); ?>" placeholder="https://maps.google.com/... or https://yourportfolio.com/..." <?php echo !empty($subscription['youtube_allowed']) ? '' : 'disabled'; ?>>
                 </div>
             </div>
 
