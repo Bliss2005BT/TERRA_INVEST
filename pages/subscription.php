@@ -102,7 +102,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <li><?php echo esc($plan['image_limit'] === null ? 'Unlimited images per listing' : 'Up to ' . $plan['image_limit'] . ' images per listing'); ?></li>
                             <li><?php echo esc($plan['video_allowed'] ? 'Video upload allowed' : 'No video upload'); ?></li>
                             <?php if (!empty($plan['youtube_allowed'])): ?>
-                                <li>YouTube link allowed</li>
+                                <li>External link allowed</li>
                             <?php endif; ?>
                             <li><?php echo esc((string) $plan['duration_days']); ?> day listing duration</li>
                         </ul>

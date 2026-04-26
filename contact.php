@@ -1,3 +1,93 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/config/db.php';
+
+function escContact(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+$formValues = [
+    'fullName' => '',
+    'email' => '',
+    'phone' => '',
+    'subject' => '',
+    'inquiryType' => '',
+    'message' => '',
+];
+$formAlertType = '';
+$formAlertMessage = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    foreach ($formValues as $key => $value) {
+        $formValues[$key] = trim((string) ($_POST[$key] ?? ''));
+    }
+
+    $errors = [];
+
+    if (mb_strlen($formValues['fullName']) < 2 || mb_strlen($formValues['fullName']) > 80) {
+        $errors[] = 'Full name should be between 2 and 80 characters.';
+    }
+
+    if (!filter_var($formValues['email'], FILTER_VALIDATE_EMAIL) || mb_strlen($formValues['email']) > 120) {
+        $errors[] = 'Enter a valid email address.';
+    }
+
+    $phoneDigits = preg_replace('/\D+/', '', $formValues['phone']);
+    if ($phoneDigits === null || strlen($phoneDigits) < 7 || strlen($phoneDigits) > 15 || mb_strlen($formValues['phone']) > 24) {
+        $errors[] = 'Enter a valid phone number.';
+    }
+
+    if (mb_strlen($formValues['subject']) < 3 || mb_strlen($formValues['subject']) > 120) {
+        $errors[] = 'Subject should be between 3 and 120 characters.';
+    }
+
+    $allowedInquiryTypes = ['Buying', 'Selling', 'Verification', 'Investment', 'Legal', 'Other'];
+    if (!in_array($formValues['inquiryType'], $allowedInquiryTypes, true)) {
+        $errors[] = 'Select a valid inquiry type.';
+    }
+
+    if (mb_strlen($formValues['message']) < 20 || mb_strlen($formValues['message']) > 1000) {
+        $errors[] = 'Message should be between 20 and 1000 characters.';
+    }
+
+    if (!$errors) {
+        try {
+            $conn = getDBConnection();
+            $stmt = $conn->prepare(
+                'INSERT INTO contact_inquiries
+                (full_name, email, phone, subject, inquiry_type, message)
+                VALUES (?, ?, ?, ?, ?, ?)'
+            );
+            $stmt->bind_param(
+                'ssssss',
+                $formValues['fullName'],
+                $formValues['email'],
+                $formValues['phone'],
+                $formValues['subject'],
+                $formValues['inquiryType'],
+                $formValues['message']
+            );
+            $stmt->execute();
+            $stmt->close();
+            closeDBConnection($conn);
+
+            $formAlertType = 'success';
+            $formAlertMessage = 'Thanks for reaching out. Your inquiry has been sent successfully.';
+            foreach ($formValues as $key => $_) {
+                $formValues[$key] = '';
+            }
+        } catch (Throwable $throwable) {
+            $formAlertType = 'error';
+            $formAlertMessage = 'We could not send your inquiry right now. Please try again later.';
+        }
+    } else {
+        $formAlertType = 'error';
+        $formAlertMessage = implode(' ', $errors);
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -753,7 +843,7 @@
                     <a href="index.html#about" class="nav-item">About</a>
                     <a href="index.html#services" class="nav-item">Services</a>
                     <a href="index.html#pricing" class="nav-item">Pricing</a>
-                    <a href="contact.html" class="nav-item" aria-current="page">Contact US</a>
+                    <a href="contact.php" class="nav-item" aria-current="page">Contact US</a>
                 </div>
 
                 <div class="nav-actions">
@@ -833,9 +923,13 @@
                         <p>Tell us what you need and we’ll route your request to the right land specialist.</p>
                     </div>
 
-                    <div id="form-alert" class="form-alert" aria-live="polite" aria-atomic="true"></div>
+                    <div id="form-alert" class="form-alert<?php echo $formAlertType !== '' ? ' is-visible is-' . escContact($formAlertType) : ''; ?>" aria-live="polite" aria-atomic="true"<?php echo $formAlertType !== '' ? ' role="' . ($formAlertType === 'success' ? 'status' : 'alert') . '"' : ''; ?>>
+                        <?php if ($formAlertType !== ''): ?>
+                            <span><?php echo escContact($formAlertMessage); ?></span>
+                        <?php endif; ?>
+                    </div>
 
-                    <form id="contact-form" class="contact-form" novalidate data-endpoint="">
+                    <form id="contact-form" class="contact-form" method="post" action="contact.php" novalidate>
                         <div class="field-grid">
                             <div class="field" data-field="fullName">
                                 <label for="full-name">Full Name</label>
@@ -843,6 +937,7 @@
                                     id="full-name"
                                     name="fullName"
                                     type="text"
+                                    value="<?php echo escContact($formValues['fullName']); ?>"
                                     placeholder="Your full name"
                                     autocomplete="name"
                                     maxlength="80"
@@ -863,6 +958,7 @@
                                     id="email"
                                     name="email"
                                     type="email"
+                                    value="<?php echo escContact($formValues['email']); ?>"
                                     placeholder="you@example.com"
                                     autocomplete="email"
                                     maxlength="120"
@@ -885,6 +981,7 @@
                                     id="phone"
                                     name="phone"
                                     type="tel"
+                                    value="<?php echo escContact($formValues['phone']); ?>"
                                     placeholder="+91 98765 43210"
                                     autocomplete="tel"
                                     inputmode="tel"
@@ -906,6 +1003,7 @@
                                     id="subject"
                                     name="subject"
                                     type="text"
+                                    value="<?php echo escContact($formValues['subject']); ?>"
                                     placeholder="What are you reaching out about?"
                                     autocomplete="off"
                                     maxlength="120"
@@ -932,12 +1030,12 @@
                                 required
                             >
                                 <option value="">Select an inquiry type</option>
-                                <option value="Buying">Buying</option>
-                                <option value="Selling">Selling</option>
-                                <option value="Verification">Verification</option>
-                                <option value="Investment">Investment</option>
-                                <option value="Legal">Legal</option>
-                                <option value="Other">Other</option>
+                                <option value="Buying" <?php echo $formValues['inquiryType'] === 'Buying' ? 'selected' : ''; ?>>Buying</option>
+                                <option value="Selling" <?php echo $formValues['inquiryType'] === 'Selling' ? 'selected' : ''; ?>>Selling</option>
+                                <option value="Verification" <?php echo $formValues['inquiryType'] === 'Verification' ? 'selected' : ''; ?>>Verification</option>
+                                <option value="Investment" <?php echo $formValues['inquiryType'] === 'Investment' ? 'selected' : ''; ?>>Investment</option>
+                                <option value="Legal" <?php echo $formValues['inquiryType'] === 'Legal' ? 'selected' : ''; ?>>Legal</option>
+                                <option value="Other" <?php echo $formValues['inquiryType'] === 'Other' ? 'selected' : ''; ?>>Other</option>
                             </select>
                             <p id="inquiry-type-error" class="field-error" aria-live="polite">
                                 <span class="field-error-icon" aria-hidden="true">!</span>
@@ -959,7 +1057,7 @@
                                 aria-invalid="false"
                                 aria-describedby="message-help message-error message-counter"
                                 required
-                            ></textarea>
+                            ><?php echo escContact($formValues['message']); ?></textarea>
                             <p id="message-help" class="field-help">Include enough context so we can connect you with the right team quickly.</p>
                             <p id="message-error" class="field-error" aria-live="polite">
                                 <span class="field-error-icon" aria-hidden="true">!</span>
@@ -1186,32 +1284,6 @@
                 label.textContent = isSubmitting ? "Sending..." : "Send message";
             }
 
-            async function submitInquiry(payload) {
-                const endpoint = form.dataset.endpoint.trim();
-
-                // If no backend endpoint is configured yet, keep the UI fully testable with a mocked async success.
-                if (!endpoint) {
-                    await new Promise((resolve) => window.setTimeout(resolve, 1100));
-                    return { success: true };
-                }
-
-                const response = await fetch(endpoint, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                });
-
-                const data = await response.json().catch(() => null);
-
-                if (!response.ok) {
-                    throw new Error(data && data.message ? data.message : "We couldn't send your message right now. Please try again.");
-                }
-
-                return data;
-            }
 
             function resetValidationState(options = {}) {
                 const preserveAlert = Boolean(options.preserveAlert);
@@ -1247,31 +1319,16 @@
                 });
             });
 
-            form.addEventListener("submit", async (event) => {
-                event.preventDefault();
+            form.addEventListener("submit", (event) => {
                 clearAlert();
 
                 if (!validateForm()) {
+                    event.preventDefault();
                     showAlert("error", "Please review the highlighted fields and try again.");
                     return;
                 }
 
                 setSubmitting(true);
-
-                try {
-                    const formData = new FormData(form);
-                    const payload = Object.fromEntries(formData.entries());
-                    await submitInquiry(payload);
-
-                    form.reset();
-                    resetValidationState({ preserveAlert: true });
-                    showAlert("success", "Thanks for reaching out. Your inquiry has been sent successfully.");
-                } catch (error) {
-                    console.error("Contact form submission failed:", error);
-                    showAlert("error", error instanceof Error ? error.message : "Something went wrong. Please try again.");
-                } finally {
-                    setSubmitting(false);
-                }
             });
 
             // Close the mobile menu after selecting a navigation item or clicking outside of it.
