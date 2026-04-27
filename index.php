@@ -36,8 +36,8 @@ $flash = getFlash();
                 <div class="close-btn" onclick="toggleMenu()">
                     <span>&times;</span>
                 </div>
-                <a href="#about" class="nav-item">About</a>
-                <a href="#pricing" class="nav-item">Pricing</a>
+                <a href="#footer" class="nav-item">About</a>
+                <a href="#services-grid" class="nav-item">Features</a>
                 <a href="#services" class="nav-item">Services</a>
                 <a href="contact.php" class="nav-item">Contact Us</a>
             </div>
@@ -101,9 +101,9 @@ $flash = getFlash();
         </div>
     </section>
 
-    <section class="services-wrapper">
+    <section class="services-wrapper" id="services">
         <div class="services-content">
-            <div class="services-grid">
+            <div class="services-grid" id="services-grid">
                 <div class="service">
                     <h3>Verified Land Listings</h3>
                     <p>Authentic land properties with verified ownership and legal documentation.</p>
@@ -142,7 +142,7 @@ $flash = getFlash();
         </div>
     </section>
 
-    <footer>
+    <footer id="footer">
         <div class="footer-container">
             <div class="footer-section">
                 <h3>Quick links</h3>

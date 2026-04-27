@@ -841,8 +841,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span>&times;</span>
                     </button>
                     <a href="index.php#about" class="nav-item">About</a>
+                    <a href="index.php#features" class="nav-item">Features</a>
                     <a href="index.php#services" class="nav-item">Services</a>
-                    <a href="index.php#pricing" class="nav-item">Pricing</a>
                     <a href="contact.php" class="nav-item" aria-current="page">Contact US</a>
                 </div>
 
