@@ -167,6 +167,13 @@ async function handleAuthSubmit(event) {
     const formType = form.dataset.authForm
         || (form.querySelector('[name="confirm_password"]') ? 'register' : 'login');
     const formData = new FormData(form);
+
+    // Pass redirect URL if set by the caller (e.g., services page)
+    const redirectUrl = form.dataset.redirect;
+    if (redirectUrl) {
+        formData.append('redirect', redirectUrl);
+    }
+
     const payload = Object.fromEntries(formData.entries());
     const errors = validateAuthForm(formType, payload);
 

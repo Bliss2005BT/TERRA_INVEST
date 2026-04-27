@@ -35,6 +35,9 @@ $name = normalizeText((string) ($_POST['name'] ?? ''));
 $email = strtolower(trim((string) ($_POST['email'] ?? '')));
 $password = (string) ($_POST['password'] ?? '');
 $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
+$redirect = trim((string) ($_POST['redirect'] ?? ''));
+$allowedRedirects = ['search.php', 'pages/subscription.php'];
+$redirectUrl = in_array($redirect, $allowedRedirects, true) ? $redirect : 'search.php';
 $errors = [];
 
 if ($name === '') {
@@ -114,9 +117,9 @@ if ($isJsonRequest) {
     respondJson([
         'success' => true,
         'message' => 'Account created successfully! Start exploring properties.',
-        'redirect' => 'search.php',
+        'redirect' => $redirectUrl,
     ]);
 }
 
-redirectTo('../search.php');
+redirectTo('../' . $redirectUrl);
 ?>

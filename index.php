@@ -22,7 +22,7 @@ $flash = getFlash();
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/script.js" defer></script>
-    <link rel="icon" type="image/png" href="assets/logo_black.png">
+    <link rel="icon" type="image/png" href="assets/web icon.png">
 </head>
 <body>
     <header class="header-wrapper">
@@ -38,7 +38,7 @@ $flash = getFlash();
                 </div>
                 <a href="#footer" class="nav-item">About</a>
                 <a href="#services-grid" class="nav-item">Features</a>
-                <a href="#services" class="nav-item">Services</a>
+                <a href="services.php" class="nav-item">Services</a>
                 <a href="contact.php" class="nav-item">Contact Us</a>
             </div>
 
@@ -66,7 +66,7 @@ $flash = getFlash();
                     </p>
 
                     <div class="cta-wrapper">
-                        <button class="btn-modern-white">Discover Acreage</button>
+                        <button class="btn-modern-white" onclick="register(); return false;">Discover Acreage</button>
                     </div>
                 </div>
             </div>
@@ -137,7 +137,7 @@ $flash = getFlash();
                     from legal verification to direct seller communication, ensuring your
                     investment is secure and profitable.
                 </p>
-                <button>Learn More</button>
+                <button type="button" onclick="window.location.href='services.php'">Learn More</button>
             </div>
         </div>
     </section>

@@ -33,6 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $email = strtolower(trim((string) ($_POST['email'] ?? '')));
 $password = (string) ($_POST['password'] ?? '');
+$redirect = trim((string) ($_POST['redirect'] ?? ''));
+$allowedRedirects = ['search.php', 'pages/subscription.php'];
+$redirectUrl = in_array($redirect, $allowedRedirects, true) ? $redirect : 'search.php';
 $errors = [];
 
 if ($email === '') {
@@ -82,9 +85,9 @@ if ($isJsonRequest) {
     respondJson([
         'success' => true,
         'message' => "Welcome back! You're signed in.",
-        'redirect' => 'search.php',
+        'redirect' => $redirectUrl,
     ]);
 }
 
-redirectTo('../search.php');
+redirectTo('../' . $redirectUrl);
 ?>
